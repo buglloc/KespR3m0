@@ -1,0 +1,49 @@
+menu "KespR3m0"
+
+  menu "HTTP"
+    config KESPR_HTTP_PORT
+      int "Listen port"
+      default 80
+
+    config KESPR_HTTP_BUF_SIZE
+      int "Buffer size for static serving"
+      default 4096
+
+    config KESPR_HTTP_FORCE_GZIP
+      bool "Force gzip encoding"
+      default n
+
+  endmenu
+
+  menu "Keyboard Service"
+
+    config KESPR_KBD_ENABLED
+      bool "Enabled"
+      default y
+
+  endmenu
+
+  menu "UART Service"
+
+    config KESPR_UARTD_ENABLED
+      bool "Enabled"
+      default y
+
+    config KESPR_UARTD_RX_PIN
+      int "RX PIN"
+      default 21
+      depends on KESPR_UARTD_ENABLED
+
+    config KESPR_UARTD_TX_PIN
+      int "TX PIN"
+      default 22
+      depends on KESPR_UARTD_ENABLED
+
+    config KESPR_UARTD_DEFAULT_BRAUD
+      int "Default braud"
+      default 115200
+      depends on KESPR_UARTD_ENABLED
+
+  endmenu
+
+endmenu

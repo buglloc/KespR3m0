@@ -1,0 +1,6 @@
+[submodule "components/LovyanGFX"]
+	path = components/LovyanGFX
+	url = https://github.com/lovyan03/LovyanGFX.git
+[submodule "front/kespr3m0"]
+	path = front/kespr3m0
+	url = https://github.com/buglloc/KespR3m0Front.git
