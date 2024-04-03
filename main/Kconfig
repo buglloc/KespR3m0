@@ -1,0 +1,7 @@
+menu "KespR3m0 Runtime"
+
+  config KESPR_DEVMODE
+    bool "Dev Mode"
+    default n
+
+endmenu

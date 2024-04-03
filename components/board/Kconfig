@@ -1,0 +1,82 @@
+menu "KespR3m0 Network"
+
+  config KESPR_HOSTNAME
+    string "Hostname"
+    default "KespR3m0"
+
+  config KESPR_NET_CONNECT_RETRIES
+    int "Connect retries"
+    default 4
+
+  menu "WiFi STA"
+
+    config KESPR_NET_STA_SSID
+      string "SSID"
+      default "BuggIOT"
+
+    config KESPR_NET_STA_PASSWORD
+      string "Password"
+
+    config KESPR_NET_STA_USE_STATIC_IP
+      bool "Use static IP"
+      default n
+
+    config KESPR_NET_STA_IP
+      string "IP"
+      default "10.0.97.97"
+      depends on KESPR_NET_STA_USE_STATIC_IP
+
+    config KESPR_NET_STA_SUBNET
+      string "Subnet"
+      default "255.255.0.0"
+      depends on KESPR_NET_STA_USE_STATIC_IP
+
+    config KESPR_NET_STA_GW
+      string "Gateway"
+      default "10.0.0.1"
+      depends on KESPR_NET_STA_USE_STATIC_IP
+
+    config KESPR_NET_STA_DNS
+      string "DNS"
+      default "10.0.0.2"
+      depends on KESPR_NET_STA_USE_STATIC_IP
+
+  endmenu
+
+  menu "WiFi AP"
+
+    config KESPR_NET_AP_SSID
+      string "SSID"
+      default "KespR3m0"
+
+    config KESPR_NET_AP_PASSWORD
+      string "Password"
+
+    config KESPR_NET_AP_IP
+      string "IP"
+      default "192.168.8.1"
+
+    config KESPR_NET_AP_SUBNET
+      string "Subnet"
+      default "255.255.0.0"
+
+    config KESPR_NET_AP_GW
+      string "Gateway"
+      default "10.0.0.1"
+
+    config KESPR_NET_AP_DNS
+      string "DNS"
+      default "10.0.0.1"
+
+    config KESPR_NET_AP_CHANNEL
+      int "WiFi Channel"
+      range 1 13
+      default 1
+
+    config KESPR_NET_AP_CONN
+      int "Maximal STA connections"
+      default 4
+
+  endmenu
+
+endmenu
