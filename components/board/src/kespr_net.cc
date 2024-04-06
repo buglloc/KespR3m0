@@ -122,7 +122,7 @@ namespace
 
     if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
       ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-      ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+      ESP_LOGI(TAG, "got ip: " IPSTR, IP2STR(&event->ip_info.ip));
       memcpy(&ipAddr_, &event->ip_info.ip, sizeof(esp_ip4_addr_t));
 
       retryNum_ = 0;

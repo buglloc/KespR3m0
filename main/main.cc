@@ -145,6 +145,12 @@ static LGFX_Sprite sprite(&lcd); // スプライトを使う場合はLGFX_Sprite
 
   void app_main(void)
   {
+  #if CONFIG_KESPR_DEVMODE
+    esp_log_level_set("*", ESP_LOG_DEBUG);
+  #else
+    esp_log_level_set("*", ESP_LOG_INFO);
+  #endif
+
     ESP_LOGI(TAG, "initialize board");
     ESP_SHUTDOWN_ON_ERROR(Board::Initialize(), TAG, "initialize board");
 

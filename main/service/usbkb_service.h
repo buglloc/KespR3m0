@@ -8,22 +8,22 @@
 
 namespace Service
 {
-  class UartHandler final : public Ws::Handler
+  class UsbkbHandler final : public Ws::Handler
   {
   public:
-    UartHandler(): Ws::Handler("uart") {};
+    UsbkbHandler() : Ws::Handler("usbkb") {};
   };
 
-  class UartService final : public BaseService
+  class UsbkbService final : public BaseService
   {
   public:
-    UartService(): BaseService("uart") {};
+    UsbkbService() : BaseService("usbkb") {};
 
     esp_err_t Initialize(httpd_handle_t server) override;
     esp_err_t Start() override;
     esp_err_t Stop() override;
 
   private:
-    UartHandler handler_ = {};
+    UsbkbHandler handler_ = {};
   };
 }

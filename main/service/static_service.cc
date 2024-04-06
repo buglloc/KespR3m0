@@ -16,11 +16,6 @@ namespace {
   static const char *kStaticPath = "/www";
   static const char *kStaticPartition = "www";
 
-  struct ServeContext
-  {
-    char Scratch[CONFIG_KESPR_HTTP_BUF_SIZE];
-  };
-
   esp_err_t mountStatic()
   {
     esp_vfs_spiffs_conf_t conf = {
@@ -150,8 +145,8 @@ namespace {
       setFileHeaders(req, filepath);
     }
 
-    ServeContext *ctx = static_cast<ServeContext *>(req->user_ctx);
-    char *chunk = ctx->Scratch;
+    StaticService::Context *ctx = static_cast<StaticService::Context *>(req->user_ctx);
+    char *chunk = ctx->scratch;
     ssize_t read_bytes;
     do {
       /* Read file in chunks into the scratch buffer */
@@ -180,20 +175,18 @@ namespace {
   }
 }
 
-esp_err_t Static::Start(httpd_handle_t server)
+esp_err_t StaticService::Initialize(httpd_handle_t server)
 {
-  static ServeContext httpCtx = {};
-
   ESP_LOGI(TAG, "mount fs");
   ESP_RETURN_ON_ERROR(mountStatic(), TAG, "mount fs");
 
-  httpd_uri_t staticURI = {
+  httpd_uri_t rootURI = {
       .uri = "/*",
       .method = HTTP_GET,
       .handler = staticHandler,
-      .user_ctx = &httpCtx
+      .user_ctx = &this->ctx
   };
-  httpd_register_uri_handler(server, &staticURI);
+  httpd_register_uri_handler(server, &rootURI);
 
-  return ESP_OK;
+  return BaseService::Initialize(server);
 }
