@@ -1,4 +1,4 @@
-#include "uart_service.h"
+#include "usbkb_service.h"
 #include <string>
 
 #include <esp_check.h>
@@ -12,13 +12,13 @@
 
 using namespace Service;
 namespace {
-  static const char *TAG = "uart_svc";
+  static const char *TAG = "usbkb_svc";
 }
 
-esp_err_t UartService::Initialize(httpd_handle_t server)
+esp_err_t UsbkbService::Initialize(httpd_handle_t server)
 {
   Ws::HandlerConfig cfg = {
-    .uri = "/uart/ws",
+    .uri = "/usbkb/ws",
     .handler = &this->handler_,
   };
   esp_err_t err = Ws::RegisterWsHandler(server, cfg);
@@ -27,7 +27,7 @@ esp_err_t UartService::Initialize(httpd_handle_t server)
   return BaseService::Initialize(server);
 }
 
-esp_err_t UartService::Start()
+esp_err_t UsbkbService::Start()
 {
   if (this->started_) {
     return ESP_OK;
@@ -37,7 +37,7 @@ esp_err_t UartService::Start()
   return BaseService::Start();
 }
 
-esp_err_t UartService::Stop()
+esp_err_t UsbkbService::Stop()
 {
   if (!this->started_) {
     return ESP_OK;
