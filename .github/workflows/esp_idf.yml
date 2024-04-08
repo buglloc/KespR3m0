@@ -17,6 +17,7 @@ jobs:
       with:
         node-version: 21
         cache: npm
+        cache-dependency-path: ./front/kespr3m0/package-lock.json
     - name: Build front
       working-directory: ./front/kespr3m0
       run: npm ci && npm run build
