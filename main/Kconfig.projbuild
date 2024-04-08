@@ -11,10 +11,10 @@ menu "KespR3m0"
 
     config KESPR_HTTP_FORCE_GZIP
       bool "Force gzip encoding"
-      default n
+      default y
 
     config KESPR_HTTP_MAX_CLIENTS
-      int "Maximum clients (total)"
+      int "Maximum clients"
       default 12
 
   endmenu
