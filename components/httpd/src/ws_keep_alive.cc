@@ -5,10 +5,10 @@
 #include "ws_utils.h"
 
 
-using namespace Service::Ws;
+using namespace HttpD;
 
 namespace {
-  static const char *TAG = "ws_klm";
+  static const char *TAG = "httpd::ws::keepalive";
 
   static uint64_t _tick_get_ms(void)
   {
@@ -144,7 +144,7 @@ esp_err_t KeepAlive::Context::RemoveClient(int sockfd)
     return ESP_OK;
   }
 
-  return ESP_ERR_NOT_FOUND;
+  return ESP_OK;
 }
 
 void KeepAlive::Context::PingClients()
@@ -161,14 +161,14 @@ void KeepAlive::Context::PingClients()
 
     auto socketType = httpd_ws_get_fd_info(this->httpd_, client.fd);
     if (socketType != HTTPD_WS_CLIENT_WEBSOCKET) {
-      ESP_LOGD(TAG, "client is not a ws, forget it. fd=%d", client.fd);
+      ESP_LOGD(TAG, "client is not a ws, forget it (fd=%d)", client.fd);
       this->RemoveClient(client.fd);
       continue;
     }
 
-    ESP_LOGD(TAG, "haven't seen the client for a while. fd=%d", client.fd);
+    ESP_LOGD(TAG, "haven't seen the client for a while (fd=%d)", client.fd);
     if (client.lastSeen + CONFIG_KESPR_WS_INACTIVE_TIMEOUT <= tickMs) {
-      ESP_LOGW(TAG, "client not alive, closing it. fd=%d", client.fd);
+      ESP_LOGW(TAG, "client not alive, closing it (fd=%d)", client.fd);
       esp_err_t err = httpd_sess_trigger_close(this->httpd_, client.fd);
       if (err != ESP_OK) {
         ESP_LOGE(TAG, "unable to close client session (fd=%d): %s", client.fd, esp_err_to_name(err));
@@ -176,18 +176,12 @@ void KeepAlive::Context::PingClients()
       continue;
     }
 
-    AsyncFrame *frame = new AsyncFrame({
-      .server = this->httpd_,
-      .fd = client.fd,
-      .builder = [](httpd_ws_frame_t *frame, void *arg) {
-        (void)(arg);
-        frame->payload = NULL;
-        frame->len = 0;
-        frame->type = HTTPD_WS_TYPE_PING;
-      },
-      .builderArg = nullptr
+    esp_err_t err = Ws::SendAsyncFrame(this->httpd_, client.fd, [](httpd_ws_frame_t *frame, void *arg) {
+      (void)(arg);
+      frame->payload = NULL;
+      frame->len = 0;
+      frame->type = HTTPD_WS_TYPE_PING;
     });
-    esp_err_t err = SendAsyncFrame(frame);
     if (err != ESP_OK) {
       ESP_LOGE(TAG, "unable to ping client (fd=%d): %s", client.fd, esp_err_to_name(err));
     }
@@ -286,4 +280,10 @@ esp_err_t KeepAliveManager::TouchClient(int sockfd)
   }
 
   return ESP_FAIL;
+}
+
+KeepAliveManager* KeepAliveManager::Global(httpd_handle_t server)
+{
+  assert(server != nullptr);
+  return static_cast<HttpD::KeepAliveManager*>(httpd_get_global_user_ctx(server));
 }
