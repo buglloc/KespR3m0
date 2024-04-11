@@ -11,7 +11,7 @@
 #include <freertos/task.h>
 
 
-namespace Service::Ws::KeepAlive
+namespace HttpD::KeepAlive
 {
   enum class ActionKind : uint8_t {
     None = 0,
@@ -56,10 +56,13 @@ namespace Service::Ws::KeepAlive
   };
 }
 
-namespace Service::Ws
+namespace HttpD
 {
   class KeepAliveManager
   {
+  public:
+    static KeepAliveManager* Global(httpd_handle_t server);
+
   public:
     esp_err_t Initialize(httpd_handle_t server);
     esp_err_t Start();

@@ -1,44 +1,5 @@
 menu "KespR3m0"
 
-  menu "HTTP"
-    config KESPR_HTTP_PORT
-      int "Listen port"
-      default 80
-
-    config KESPR_HTTP_BUF_SIZE
-      int "Buffer size for static serving"
-      default 4096
-
-    config KESPR_HTTP_FORCE_GZIP
-      bool "Force gzip encoding"
-      default y
-
-    config KESPR_HTTP_MAX_CLIENTS
-      int "Maximum clients"
-      default 12
-
-  endmenu
-
-  menu "WebSocket"
-
-    config KESPR_WS_TASK_STACK_SIZE
-      int "Task stack size"
-      default 2048
-
-    config KESPR_WS_CHECK_ALIVE_PERIOD
-      int "Keep-Alive period (ms)"
-      default 5000
-      help
-          Check every client after this time
-
-    config KESPR_WS_INACTIVE_TIMEOUT
-      int "Inactive timeout (ms)"
-      default 10000
-      help
-          Consider client not alive after this time
-
-  endmenu
-
   menu "USB Keyboard Service"
 
     config KESPR_USBKBD_ENABLED
@@ -66,6 +27,21 @@ menu "KespR3m0"
     config KESPR_UARTD_DEFAULT_BRAUD
       int "Default braud"
       default 115200
+      depends on KESPR_UARTD_ENABLED
+
+    config KESPR_UARTD_BUF_SIZE
+      int "Buff size"
+      default 1024
+      depends on KESPR_UARTD_ENABLED
+
+    config KESPR_UARTD_READ_PERIOD
+      int "Read period (ms)"
+      default 500
+      depends on KESPR_UARTD_ENABLED
+
+    config KESPR_UARTD_RX_STACK_SIZE
+      int "Buff size"
+      default 4096
       depends on KESPR_UARTD_ENABLED
 
   endmenu

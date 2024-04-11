@@ -1,4 +1,10 @@
 dependencies:
+  bblanchon/arduinojson:
+    component_hash: 7ffbe0d932aad0015a6b8586794ec197b1765c3d8af74b72af6055492946a6b0
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 7.0.4
   idf:
     component_hash: null
     source:
@@ -10,6 +16,6 @@ dependencies:
       service_url: https://api.components.espressif.com/
       type: service
     version: 9.1.0
-manifest_hash: 32277ebb33c6d33d895fee1e2bdb0cbc6ad90e701198e31ae487b18de0c203e4
+manifest_hash: 989b75ecc9069da4bbafa1ad8c0e682543a06cf8b6946f0853a2238af7cc995b
 target: esp32s3
 version: 1.0.0

@@ -1,4 +1,4 @@
-#include "static_service.h"
+#include "static_handler.h"
 #include <string>
 #include <fcntl.h>
 
@@ -10,11 +10,15 @@
 #include <esp_vfs.h>
 
 
-using namespace Service;
+using namespace HttpD;
 namespace {
-  static const char *TAG = "static_svc";
+  static const char *TAG = "httpd::static";
   static const char *kStaticPath = "/www";
   static const char *kStaticPartition = "www";
+
+  typedef struct {
+    char scratch[CONFIG_KESPR_HTTP_BUF_SIZE];
+  } ServeContext;
 
   esp_err_t mountStatic()
   {
@@ -108,8 +112,8 @@ namespace {
     return true;
   #else
 
-    HttpContext *ctx = static_cast<HttpContext *>(req->user_ctx);
-    char *acceptVal = ctx->Scratch;
+    ServeContext *ctx = static_cast<ServeContext *>(req->user_ctx);
+    char *acceptVal = ctx->scratch;
     if (httpd_req_get_hdr_value_str(req, "Accept-Encoding", acceptVal, CONFIG_KESPR_HTTP_BUF_SIZE) != ESP_OK) {
       return false;
     }
@@ -145,7 +149,7 @@ namespace {
       setFileHeaders(req, filepath);
     }
 
-    StaticService::Context *ctx = static_cast<StaticService::Context *>(req->user_ctx);
+    ServeContext *ctx = static_cast<ServeContext *>(req->user_ctx);
     char *chunk = ctx->scratch;
     ssize_t read_bytes;
     do {
@@ -175,18 +179,17 @@ namespace {
   }
 }
 
-esp_err_t StaticService::Initialize(httpd_handle_t server)
+esp_err_t StaticHandler::Register(httpd_handle_t server)
 {
   ESP_LOGI(TAG, "mount fs");
   ESP_RETURN_ON_ERROR(mountStatic(), TAG, "mount fs");
 
+  static ServeContext ctx = {};
   httpd_uri_t rootURI = {
       .uri = "/*",
       .method = HTTP_GET,
       .handler = staticHandler,
-      .user_ctx = &this->ctx
+      .user_ctx = &ctx
   };
-  httpd_register_uri_handler(server, &rootURI);
-
-  return BaseService::Initialize(server);
+  return httpd_register_uri_handler(server, &rootURI);
 }
