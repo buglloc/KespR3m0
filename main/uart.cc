@@ -8,6 +8,7 @@
 #include "driver/uart.h"
 #include "driver/gpio.h"
 
+#include <defer.h>
 #include <base64.h>
 #include <httpd/events.h>
 
@@ -18,6 +19,7 @@ namespace {
   static const char* RX_TAG = "app::uart::rx";
   const size_t kRxBufSize = CONFIG_KESPR_UARTD_BUF_SIZE;
   const size_t kRxBase64BufSize = BASE64_ENCODE_OUT_SIZE(CONFIG_KESPR_UARTD_BUF_SIZE);
+  const size_t kTxBufSize = BASE64_DECODE_OUT_SIZE(CONFIG_KESPR_UARTD_BUF_SIZE);
 
   esp_err_t initUart()
   {
@@ -53,9 +55,11 @@ namespace {
 
     uint8_t *rawData = reinterpret_cast<uint8_t *>(malloc(kRxBufSize * 2));
     assert(rawData);
+    REF_DEFER(free(rawData));
 
     char *base64Data = reinterpret_cast<char *>(malloc(kRxBase64BufSize));
     assert(base64Data);
+    REF_DEFER(free(base64Data));
 
     while (ctx->started && ctx->server != nullptr) {
       const int rxBytes = uart_read_bytes(USED_UART_NUM, rawData, kRxBufSize - 1, CONFIG_KESPR_UARTD_READ_PERIOD / portTICK_PERIOD_MS);
@@ -69,8 +73,6 @@ namespace {
     }
 
     ESP_LOGI(RX_TAG, "stopped");
-    free(rawData);
-    free(base64Data);
   }
 }
 
@@ -94,6 +96,7 @@ esp_err_t UartApp::Start(httpd_handle_t server)
     return err;
   }
 
+  this->txBuf = static_cast<uint8_t *>(malloc(kTxBufSize));
   this->ctx_.server = server;
   this->ctx_.started = true;
   xTaskCreate(rxTask, "uart_rx_task", CONFIG_KESPR_UARTD_RX_STACK_SIZE, &this->ctx_, configMAX_PRIORITIES - 1, nullptr);
@@ -107,6 +110,8 @@ esp_err_t UartApp::Stop(httpd_handle_t server)
     return ESP_ERR_INVALID_STATE;
   }
 
+  free(this->txBuf);
+  this->txBuf = nullptr;
   this->ctx_.started = false;
   esp_err_t err = uart_driver_delete(UART_NUM_2);
   ESP_RETURN_ON_ERROR(err, TAG, "delete uart");
@@ -116,7 +121,13 @@ esp_err_t UartApp::Stop(httpd_handle_t server)
 
 esp_err_t UartApp::HandleTx(httpd_req_t *req, const JsonObjectConst& reqJson, JsonObject& rspJson)
 {
-  const std::string data = reqJson["data"];
-  uart_write_bytes(USED_UART_NUM, data.c_str(), data.size());
+  std::string_view base64Data = reqJson["data"];
+  if (base64Data.size() > CONFIG_KESPR_UARTD_BUF_SIZE) {
+    ESP_LOGE(TAG, "trying to parse too big msg: %d > %d", base64Data.size(), CONFIG_KESPR_UARTD_BUF_SIZE);
+    return ESP_ERR_NO_MEM;
+  }
+
+  size_t dataLen = base64_decode(base64Data.data(), base64Data.size(), this->txBuf);
+  uart_write_bytes(USED_UART_NUM, this->txBuf, dataLen);
   return ESP_OK;
 }

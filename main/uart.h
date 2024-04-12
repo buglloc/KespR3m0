@@ -25,4 +25,5 @@ protected:
 
 protected:
   Context ctx_ = {};
+  uint8_t *txBuf = nullptr;
 };
