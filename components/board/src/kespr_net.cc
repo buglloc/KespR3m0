@@ -48,7 +48,7 @@ namespace
     return ESP_OK;
   }
 
-  static void setIPSTA(esp_netif_t *netif)
+  void setIPSTA(esp_netif_t *netif)
   {
     if (esp_netif_dhcpc_stop(netif) != ESP_OK) {
       ESP_LOGE(TAG, "failed to stop dhcp client");
@@ -69,45 +69,44 @@ namespace
     ESP_ERROR_CHECK(setDNSServer(netif, ipaddr_addr(CONFIG_KESPR_NET_STA_DNS), ESP_NETIF_DNS_MAIN));
   }
 #else
-  static void setIPSTA(esp_netif_t *netif)
+  void setIPSTA(esp_netif_t *netif)
   {
     (void)(netif);
   }
 #endif
 
-  static void staEventHandler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
+  void ipEventHandler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
   {
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
+    if (event_id != IP_EVENT_STA_GOT_IP) {
+      return;
+    }
+
+    ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
+    ESP_LOGI(TAG, "got ip: " IPSTR, IP2STR(&event->ip_info.ip));
+    memcpy(&ipAddr_, &event->ip_info.ip, sizeof(esp_ip4_addr_t));
+
+    retryNum_ = 0;
+    xEventGroupSetBits(stateGroup_, WIFI_CONNECTED_BIT);
+  }
+
+  void wifiEventHandler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+  {
+    switch (event_id) {
+    case WIFI_EVENT_STA_START: {
       esp_wifi_connect();
-      return;
+      break;
     }
 
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
+    case WIFI_EVENT_STA_CONNECTED: {
       setIPSTA(static_cast<esp_netif_t *>(arg));
-      return;
+      break;
     }
 
-    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+    case WIFI_EVENT_STA_DISCONNECTED: {
       ipAddr_.addr = IPADDR_NONE;
 
-      wifi_event_sta_disconnected_t* disconnected = (wifi_event_sta_disconnected_t*) event_data;
-      /* Set code corresponding to the reason for disconnection */
-      switch (disconnected->reason) {
-        case WIFI_REASON_AUTH_EXPIRE:
-        case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
-        case WIFI_REASON_AUTH_FAIL:
-        case WIFI_REASON_HANDSHAKE_TIMEOUT:
-        case WIFI_REASON_MIC_FAILURE:
-          ESP_LOGE(TAG, "wifi disconnected, reason[%d]: auth error", disconnected->reason);
-          break;
-
-        case WIFI_REASON_NO_AP_FOUND:
-          ESP_LOGE(TAG, "wifi disconnected, reason[%d]: AP not found", disconnected->reason);
-          break;
-
-        default:
-          ESP_LOGE(TAG, "wifi disconnected, reason[%d]: unknown", disconnected->reason);
-      }
+      wifi_event_sta_disconnected_t *disconnected = (wifi_event_sta_disconnected_t *)event_data;
+      ESP_LOGE(TAG, "wifi disconnected, reason: %d", disconnected->reason);
 
       if (retryNum_ >= CONFIG_KESPR_NET_CONNECT_RETRIES) {
         xEventGroupSetBits(stateGroup_, WIFI_FAIL_BIT);
@@ -117,17 +116,23 @@ namespace
       esp_wifi_connect();
       retryNum_++;
       ESP_LOGI(TAG, "retry to connect to the AP '%s'. Try num: %d", CONFIG_KESPR_NET_STA_SSID, retryNum_);
-      return;
+      break;
     }
 
-    if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
-      ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-      ESP_LOGI(TAG, "got ip: " IPSTR, IP2STR(&event->ip_info.ip));
-      memcpy(&ipAddr_, &event->ip_info.ip, sizeof(esp_ip4_addr_t));
+    case WIFI_EVENT_AP_STACONNECTED: {
+      wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
+      ESP_LOGI(TAG, "station " MACSTR " join, AID=%d", MAC2STR(event->mac), event->aid);
+      break;
+    }
 
-      retryNum_ = 0;
-      xEventGroupSetBits(stateGroup_, WIFI_CONNECTED_BIT);
-      return;
+    case WIFI_EVENT_AP_STADISCONNECTED: {
+      wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
+      ESP_LOGI(TAG, "station " MACSTR " leave, AID=%d", MAC2STR(event->mac), event->aid);
+      break;
+    }
+
+    default:
+      break;
     }
   }
 
@@ -143,23 +148,21 @@ namespace
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_RETURN_ON_ERROR(esp_wifi_init(&cfg), TAG, "initialize wifi");
 
-    esp_event_handler_instance_t instance_any_id;
     esp_err_t err = esp_event_handler_instance_register(
       WIFI_EVENT,
       ESP_EVENT_ANY_ID,
-      &staEventHandler,
+      &wifiEventHandler,
       staNetif,
-      &instance_any_id
+      nullptr
     );
     ESP_RETURN_ON_ERROR(err, TAG, "register wifi event handler");
 
-    esp_event_handler_instance_t instance_got_ip;
     err = esp_event_handler_instance_register(
       IP_EVENT,
       IP_EVENT_STA_GOT_IP,
-      &staEventHandler,
+      &ipEventHandler,
       staNetif,
-      &instance_got_ip
+      nullptr
     );
     ESP_RETURN_ON_ERROR(err, TAG, "register ip event handler");
 
@@ -191,6 +194,8 @@ namespace
       return ESP_OK;
     }
 
+    esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &wifiEventHandler);
+    esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &ipEventHandler);
     esp_wifi_stop();
     esp_netif_destroy_default_wifi(staNetif);
     if (bits & WIFI_FAIL_BIT) {
@@ -200,21 +205,6 @@ namespace
 
     ESP_LOGE(TAG, "UNEXPECTED EVENT");
     return ESP_FAIL;
-  }
-
-  static void apEventHandler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
-  {
-    if (event_id == WIFI_EVENT_AP_STACONNECTED) {
-      wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
-      ESP_LOGI(TAG, "station " MACSTR " join, AID=%d", MAC2STR(event->mac), event->aid);
-      return;
-    }
-
-    if (event_id == WIFI_EVENT_AP_STADISCONNECTED) {
-      wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
-      ESP_LOGI(TAG, "station " MACSTR " leave, AID=%d", MAC2STR(event->mac), event->aid);
-      return;
-    }
   }
 
   esp_err_t connectAP()
@@ -229,8 +219,8 @@ namespace
     esp_err_t err = esp_event_handler_instance_register(
       WIFI_EVENT,
       ESP_EVENT_ANY_ID,
-      &apEventHandler,
-      nullptr,
+      &wifiEventHandler,
+      staNetif,
       nullptr
     );
     ESP_RETURN_ON_ERROR(err, TAG, "register wifi event handler");
