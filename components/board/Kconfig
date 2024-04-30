@@ -79,12 +79,4 @@ menu "KespR3m0 Network"
 
   endmenu
 
-  menu "Display"
-
-    config KESPR_DISPLAY_BRIGHTNESS
-      int "Display brightness"
-      default 120
-
-  endmenu
-
 endmenu

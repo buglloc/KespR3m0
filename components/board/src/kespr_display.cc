@@ -28,21 +28,35 @@ esp_err_t Display::Initialize()
 
   initialized_ = true;
 
-  display_.setBrightness(CONFIG_KESPR_DISPLAY_BRIGHTNESS);
-  display_.setTextSize((std::max(display_.width(), display_.height()) + 255) >> 8);
-  display_.fillScreen(TFT_WHITE);
-
-  uint32_t count = ~0;
-  {
-    display_.startWrite();
-    display_.setRotation(++count & 7);
-
-    display_.setTextColor(TFT_BLACK);
-    display_.drawRect(60,60,display_.width()-120,display_.height()-120,count*7);
-    display_.drawFastHLine(0, 0, 10);
-
-    display_.endWrite();
-  }
-
+  display_.setColorDepth(16);
+  display_.fillScreen(TFT_BLACK);
   return ESP_OK;
+}
+
+void Display::PushPixels(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const uint16_t *data)
+{
+  display_.startWrite();
+  display_.setAddrWindow(x, y, w, h);
+  display_.pushPixels(data, w * h, true);
+  display_.endWrite();
+}
+
+uint8_t Display::GetBrightness()
+{
+  return display_.getBrightness();
+}
+
+void Display::SetBrightness(uint8_t brightness)
+{
+  return display_.setBrightness(brightness);
+}
+
+uint32_t Display::Width()
+{
+  return display_.width();
+}
+
+uint32_t Display::Height()
+{
+  return display_.height();
 }

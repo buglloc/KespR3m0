@@ -6,6 +6,7 @@ SRCS
 INCLUDE_DIRS
   "."
 REQUIRES
-  log arduinojson
-  ui board httpd defer base64
+  driver log arduinojson
+  board httpd gui
+  defer base64
 )

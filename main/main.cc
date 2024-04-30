@@ -4,6 +4,7 @@
 
 #include <kespr_board.h>
 #include <kespr_display.h>
+#include <kespr_gui.h>
 #include <kespr_net.h>
 #include <defer.h>
 #include <httpd/server.h>
@@ -38,6 +39,9 @@ void app_main(void)
 
   ESP_LOGI(TAG, "start display");
   ESP_SHUTDOWN_ON_ERROR(Display::Initialize(), TAG, "start display");
+
+  ESP_LOGI(TAG, "start GUI");
+  ESP_SHUTDOWN_ON_ERROR(GUI::Initialize(), TAG, "start GUI");
 
   ESP_LOGI(TAG, "start network");
   ESP_SHUTDOWN_ON_ERROR(Net::Start(), TAG, "start network");
