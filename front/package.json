@@ -23,7 +23,7 @@
     "vuetify": "^3.5.15"
   },
   "devDependencies": {
-    "@babel/types": "^7.24.0",
+    "@babel/types": "^7.24.5",
     "@mdi/js": "^7.4.47",
     "@types/node": "^20.12.7",
     "@vitejs/plugin-vue": "^5.0.4",
