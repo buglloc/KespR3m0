@@ -27,7 +27,7 @@ message(STATUS "CMAKE_BINARY_DIR = ${CMAKE_BINARY_DIR}")
 message(STATUS "---------------------------------------")
 
 # Embed front
-set(WEB_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/front/kespr3m0")
+set(WEB_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/front")
 set(WEB_DIST_DIR "${WEB_SRC_DIR}/dist")
 if(CONFIG_KESPR_HTTP_FORCE_GZIP)
   set(WEB_DIST_DIR "${WEB_SRC_DIR}/dist.gz")
