@@ -1,0 +1,29 @@
+name: Front CI
+
+on:
+  push:
+    branches: main
+  pull_request:
+
+jobs:
+  verify_files:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 21
+        cache: npm
+        cache-dependency-path: ./front/package-lock.json
+    - name: Install Packages
+      working-directory: ./front
+      run: npm ci
+    - name: Lint Files
+      working-directory: ./front
+      run: npm run lint
+    - name: Build
+      working-directory: ./front
+      run: npm run build

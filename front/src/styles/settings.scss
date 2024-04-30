@@ -1,0 +1,34 @@
+/**
+ * src/styles/settings.scss
+ *
+ * Configures SASS variables and Vuetify overwrites
+ */
+
+// https://vuetifyjs.com/features/sass-variables/`
+// @use 'vuetify/settings' with (
+//   $color-pack: false
+// );
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url(@fontsource/roboto/files/roboto-latin-400-normal.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url(@fontsource/roboto-mono/files/roboto-mono-latin-400-normal.woff2) format('woff2');
+}
+
+html {
+  overflow-y: auto;
+}
+
+body {
+  font-family: "Roboto", sans-serif !important;
+}
