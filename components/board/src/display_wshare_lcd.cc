@@ -62,8 +62,9 @@ esp_err_t WShareLCD::Initialize()
     this->panel_.setLight(&this->backlight_);
   }
 
+  this->setBrightness(0);
   this->setPanel(&this->panel_);
-  if (!this->init()) {
+  if (!this->init_without_reset()) {
     return ESP_FAIL;
   }
 

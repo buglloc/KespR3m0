@@ -3,11 +3,12 @@ SRCS
   "src/kespr_board.cc"
   "src/kespr_display.cc"
   "src/kespr_net.cc"
-  "priv/display_wshare_lcd.cc"
+
+  "src/display_wshare_lcd.cc"
 INCLUDE_DIRS
   "include"
 PRIV_INCLUDE_DIRS
-  "priv"
+  "priv_include"
 REQUIRES
   esp_netif
 PRIV_REQUIRES
