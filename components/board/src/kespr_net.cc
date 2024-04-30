@@ -1,23 +1,23 @@
 #include "kespr_net.h"
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <freertos/event_groups.h>
 
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "esp_check.h"
-#include "esp_mac.h"
+#include <esp_system.h>
+#include <esp_wifi.h>
+#include <esp_event.h>
+#include <esp_log.h>
+#include <esp_check.h>
+#include <esp_mac.h>
 
-#include "nvs_flash.h"
-#include "lwip/err.h"
-#include "lwip/sys.h"
-#include "lwip/ip_addr.h"
-#include "lwip/inet.h"
+#include <nvs_flash.h>
+#include <lwip/err.h>
+#include <lwip/sys.h>
+#include <lwip/ip_addr.h>
+#include <lwip/inet.h>
 
-#include "dns_server.h"
+#include <dns_server.h>
 
 
 using namespace KESPR;

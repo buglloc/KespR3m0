@@ -5,7 +5,7 @@ INCLUDE_DIRS
   "include"
 REQUIRES
   driver
-  LovyanGFX lvgl
+  lvgl
 PRIV_REQUIRES
   esp_timer heap esp_hw_support
 )

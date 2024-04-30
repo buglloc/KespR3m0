@@ -7,5 +7,5 @@ INCLUDE_DIRS
   "."
 REQUIRES
   log arduinojson
-  ui board httpd defer base64 LovyanGFX
+  ui board httpd defer base64
 )

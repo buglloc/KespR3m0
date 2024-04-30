@@ -2,7 +2,7 @@
 #include <esp_err.h>
 
 
-namespace KESPR::Board
+namespace KESPR::Display
 {
   esp_err_t Initialize();
 }

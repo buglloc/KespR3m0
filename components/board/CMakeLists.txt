@@ -1,14 +1,18 @@
 idf_component_register(
 SRCS
   "src/kespr_board.cc"
+  "src/kespr_display.cc"
   "src/kespr_net.cc"
+  "priv/display_wshare_lcd.cc"
 INCLUDE_DIRS
   "include"
+PRIV_INCLUDE_DIRS
+  "priv"
 REQUIRES
   esp_netif
 PRIV_REQUIRES
   esp_wifi esp_event nvs_flash
-  dns_server
+  dns_server LovyanGFX
 )
 
 # TODO(buglloc): fix me
