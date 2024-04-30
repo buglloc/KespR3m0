@@ -19,7 +19,7 @@ jobs:
         cache: npm
         cache-dependency-path: ./front/package-lock.json
     - name: Build front
-      working-directory: ./front/kespr3m0
+      working-directory: ./front
       run: npm ci && npm run build
     - name: ESP-IDF v5.2.1 build esp32s3
       uses: espressif/esp-idf-ci-action@v1
