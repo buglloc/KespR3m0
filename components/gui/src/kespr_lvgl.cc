@@ -21,30 +21,72 @@ using namespace KESPR::GUI;
 namespace
 {
   static const char* TAG = "kespr::gui::lvgl";
+  const uint32_t kMaxSleepMs = CONFIG_KESPR_GUI_PERIOD_TIME_MS * 2;
   static SemaphoreHandle_t guiMu_ = {};
   static lv_display_t *lvDisp_ = nullptr;
 
-  void lvGuiTask(void *arg)
+  void lvTask(void *arg)
   {
     ESP_LOGI(TAG, "starting LVGL task");
+    LV_UNUSED(arg);
     uint32_t taskDelayMS = 0;
     for (;;)
     {
-      taskDelayMS = 0;
-      if (xSemaphoreTake(guiMu_, portMAX_DELAY) == pdTRUE) {
+      taskDelayMS = kMaxSleepMs;
+      if (LVGL::Lock(0)) {
         taskDelayMS = lv_task_handler();
-        xSemaphoreGive(guiMu_);
+        LVGL::Unlock();
       }
 
-      if (taskDelayMS > 500) {
-        taskDelayMS = 500;
-      } else if (taskDelayMS < 5) {
-        taskDelayMS = 5;
+      if (taskDelayMS > kMaxSleepMs || taskDelayMS == 1) {
+        taskDelayMS = kMaxSleepMs;
+      } else if (taskDelayMS < 1) {
+        taskDelayMS = 1;
       }
 
       vTaskDelay(pdMS_TO_TICKS(taskDelayMS));
     }
   }
+
+  void lvTick(void *arg)
+  {
+    LV_UNUSED(arg);
+    lv_tick_inc(CONFIG_KESPR_GUI_LVGL_TICK_MS);
+  }
+
+ #if LV_USE_LOG
+  void lvLog(lv_log_level_t level, const char *buf)
+  {
+    switch (level) {
+      case LV_LOG_LEVEL_TRACE:
+        ESP_LOGD(TAG, "%s", buf);
+        return;
+
+      case LV_LOG_LEVEL_INFO:
+        ESP_LOGI(TAG, "%s", buf);
+        return;
+
+      case LV_LOG_LEVEL_WARN:
+        ESP_LOGW(TAG, "%s", buf);
+        return;
+
+      case LV_LOG_LEVEL_ERROR:
+        ESP_LOGE(TAG, "%s", buf);
+        return;
+
+      case LV_LOG_LEVEL_USER:
+        ESP_LOGI(TAG, "%s", buf);
+        return;
+
+      case LV_LOG_LEVEL_NONE:
+        return;
+
+      default:
+        ESP_LOGE(TAG, "unexpected[%d]: %s", static_cast<int>(level), buf);
+        return;
+    };
+  }
+#endif
 }
 
 esp_err_t LVGL::Initialize()
@@ -59,35 +101,32 @@ esp_err_t LVGL::Initialize()
   lv_init();
 
   #if LV_USE_LOG
-    lv_log_register_print_cb([](const char* buf) -> void {
-      ESP_LOGI(LV_TAG, "%s", buf);
-    });
+    lv_log_register_print_cb(lvLog);
   #endif
 
   // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
-  uint16_t bufSize = KESPR::Display::Width() * KESPR::Display::Height() * sizeof(lv_color_t);
-  lv_color_t *buf1 = reinterpret_cast<lv_color_t *>(heap_caps_malloc(bufSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+  uint32_t bufSize = KESPR::Display::Width() * KESPR::Display::Height() * sizeof(lv_color16_t) / 10;
+  ESP_LOGI(TAG, "%lu - %lu - %lu - %d", bufSize, KESPR::Display::Width(), KESPR::Display::Height(), sizeof(lv_color16_t));
+  lv_color16_t *buf1 = reinterpret_cast<lv_color16_t *>(heap_caps_malloc(bufSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
   assert(buf1);
-  lv_color_t *buf2 = reinterpret_cast<lv_color_t *>(heap_caps_malloc(bufSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+  lv_color16_t *buf2 = reinterpret_cast<lv_color16_t *>(heap_caps_malloc(bufSize, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
   assert(buf2);
 
   lvDisp_ = lv_display_create(KESPR::Display::Width(), KESPR::Display::Height());
   assert(lvDisp_);
+
   lv_display_set_buffers(lvDisp_, buf1, buf2, bufSize, LV_DISPLAY_RENDER_MODE_PARTIAL);
   lv_display_set_flush_cb(lvDisp_, [](lv_display_t *disp, const lv_area_t *area, uint8_t *px_map) -> void {
-    uint32_t w = (area->x2 - area->x1 + 1);
-    uint32_t h = (area->y2 - area->y1 + 1);
+    uint32_t w = lv_area_get_width(area);
+    uint32_t h = lv_area_get_height(area);
 
-    KESPR::Display::PushPixels(area->x1, area->y1, w, h, reinterpret_cast<uint16_t *>(px_map));
+    KESPR::Display::PushPixels(area->x1, area->y1, w, h, px_map);
     lv_disp_flush_ready(disp);
   });
 
   /* Create and start a periodic timer interrupt to call lv_tick_inc */
   const esp_timer_create_args_t periodic_timer_args = {
-    .callback = [](void *arg) -> void {
-      (void) arg;
-      lv_tick_inc(CONFIG_KESPR_GUI_LVGL_TICK_MS);
-    },
+    .callback = lvTick,
     .name = "lvgl_tick",
   };
   esp_timer_handle_t periodic_timer;
@@ -97,14 +136,42 @@ esp_err_t LVGL::Initialize()
   err = esp_timer_start_periodic(periodic_timer, CONFIG_KESPR_GUI_LVGL_TICK_MS * 1000);
   ESP_RETURN_ON_ERROR(err, TAG, "start lvgl_tick timer");
 
-  xTaskCreatePinnedToCore(
-    lvGuiTask,
-    "lvgl_gui_task",
+  BaseType_t task;
+#if CONFIG_KESPR_GUI_LVGL_TASK_AFFINITY >= 0
+  task = xTaskCreatePinnedToCore(
+    lvTask,
+    "lvgl_task",
     CONFIG_KESPR_GUI_LVGL_TASK_STACK,
     nullptr,
-    tskIDLE_PRIORITY+CONFIG_KESPR_GUI_LVGL_PRIO,
+    tskIDLE_PRIORITY+CONFIG_KESPR_GUI_LVGL_TASK_PRIO,
     nullptr,
-    CONFIG_KESPR_GUI_LVGL_PIN_CORE
+    CONFIG_KESPR_GUI_LVGL_TASK_AFFINITY
   );
+#else
+  task = xTaskCreate(
+    lvTask,
+    "lvgl_task",
+    CONFIG_KESPR_GUI_LVGL_TASK_STACK * 2,
+    nullptr,
+    tskIDLE_PRIORITY+CONFIG_KESPR_GUI_LVGL_TASK_PRIO,
+    nullptr
+  );
+#endif
+
+  ESP_RETURN_ON_FALSE(task == pdPASS, ESP_FAIL, TAG, "create LVGL task fail");
   return ESP_OK;
+}
+
+bool LVGL::Lock(uint32_t timeoutMs)
+{
+    assert(guiMu_ && "LVGL::Initialize must be called first");
+
+    const TickType_t timeout = (timeoutMs == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeoutMs);
+    return xSemaphoreTake(guiMu_, timeout) == pdTRUE;
+}
+
+void LVGL::Unlock()
+{
+    assert(guiMu_ && "LVGL::Initialize must be called first");
+    xSemaphoreGive(guiMu_);
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include <esp_err.h>
 
-#include <LovyanGFX.hpp>
+#include "lovyan_gfx.h"
 
 
 namespace KESPR::Display

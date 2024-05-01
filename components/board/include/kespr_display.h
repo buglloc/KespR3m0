@@ -6,7 +6,7 @@ namespace KESPR::Display
 {
   esp_err_t Initialize();
 
-  void PushPixels(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const uint16_t *data);
+  void PushPixels(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const uint8_t *px_map);
 
   uint8_t GetBrightness();
   void SetBrightness(uint8_t brightness);

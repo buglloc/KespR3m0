@@ -288,3 +288,26 @@ esp_ip4_addr_t Net::CurrentIP() {
 Net::Mode Net::CurrentMode() {
   return mode_;
 }
+
+int32_t Net::Signal() {
+  if (mode_ == Net::Mode::None) {
+    return 0;
+  }
+
+  if (mode_ == Net::Mode::AP) {
+    return 100;
+  }
+
+  wifi_ap_record_t ap;
+  esp_err_t err = esp_wifi_sta_get_ap_info(&ap);
+  if (err != ESP_OK) {
+    ESP_LOGW(TAG, "unable to get ap info: %s", esp_err_to_name(err));
+    return 0;
+  }
+
+  if (ap.rssi < -90 || ap.rssi >= 0) {
+    return 0;
+  }
+
+  return 100 + ap.rssi / 2;
+}

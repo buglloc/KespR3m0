@@ -2,32 +2,27 @@ menu "KespR3m0 GUI"
 
   config KESPR_DEFAULT_BRIGHTNESS
     int "Display brightness"
-    default 120
+    default 40
 
   config KESPR_GUI_LVGL_TICK_MS
     int "LVGL tick period (ms)"
-    default 1
+    default 5
 
   config KESPR_GUI_LVGL_TASK_STACK
     int "LVGL task stack size"
     default 8192
 
-  config KESPR_GUI_LVGL_PRIO
+  config KESPR_GUI_LVGL_TASK_PRIO
     int "LVGL task prio"
     default 5
 
-  config KESPR_GUI_LVGL_PIN_CORE
-    int "LVGL task pin core"
-    default 1
+  config KESPR_GUI_LVGL_TASK_AFFINITY
+    int "LVGL task core affinity"
+    default -1
 
   config KESPR_GUI_PERIOD_TIME_MS
     int "GUI update period time (ms)"
-    range 5 100
-    default 60
-
-  config KESPR_GUI_UPDATE_INFO_PERIOD_MS
-    int "How ofen update very dynamic info (e.g. core temp) in ms"
-    range 50 5000
-    default 1500
+    range 5 500
+    default 120
 
 endmenu
