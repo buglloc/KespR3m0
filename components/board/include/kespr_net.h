@@ -15,4 +15,5 @@ namespace KESPR::Net
   esp_err_t Start();
   esp_ip4_addr_t CurrentIP();
   Mode CurrentMode();
+  int32_t Signal();
 }

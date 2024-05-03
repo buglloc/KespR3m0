@@ -1,16 +1,20 @@
 #include "uart.h"
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_log.h"
-#include "esp_check.h"
-#include "driver/uart.h"
-#include "driver/gpio.h"
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#include <esp_system.h>
+#include <esp_log.h>
+#include <esp_check.h>
+
+#include <driver/uart.h>
+#include <driver/gpio.h>
 
 #include <defer.h>
 #include <base64.h>
 #include <httpd/events.h>
+#include <kespr_gui.h>
+
 
 #define USED_UART_NUM UART_NUM_2
 
@@ -72,6 +76,7 @@ namespace {
       HttpD::BroadcastEvent(ctx->server, event.as<JsonVariantConst>());
     }
 
+    vTaskDelete(nullptr);
     ESP_LOGI(RX_TAG, "stopped");
   }
 }

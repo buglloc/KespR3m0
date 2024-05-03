@@ -9,7 +9,7 @@ esp_err_t WShareLCD::Initialize()
 {
   {
     auto cfg = this->bus_.config();
-    
+
     cfg.spi_host    =       SPI2_HOST;
     cfg.spi_mode    =               0;
     cfg.freq_write  =        80000000;
@@ -42,7 +42,7 @@ esp_err_t WShareLCD::Initialize()
     cfg.dummy_read_pixel =     8;
     cfg.dummy_read_bits  =     1;
     cfg.readable         =  true;
-    cfg.invert           = true;
+    cfg.invert           =  true;
     cfg.rgb_order        = false;
     cfg.dlen_16bit       = false;
     cfg.bus_shared       =  true;

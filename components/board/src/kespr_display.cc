@@ -13,7 +13,7 @@ namespace
 {
   static const char* TAG = "kespr::display";
   static bool initialized_ = false;
-  static Display::WShareLCD display_ = {}; 
+  static Display::WShareLCD display_ = {};
 }
 
 esp_err_t Display::Initialize()
@@ -33,11 +33,11 @@ esp_err_t Display::Initialize()
   return ESP_OK;
 }
 
-void Display::PushPixels(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const uint16_t *data)
+void Display::PushPixels(uint32_t x, uint32_t y, uint32_t w, uint32_t h, const uint8_t *px_map)
 {
   display_.startWrite();
   display_.setAddrWindow(x, y, w, h);
-  display_.pushPixels(data, w * h, true);
+  display_.writePixels(reinterpret_cast<const lgfx::rgb565_t *>(px_map), w * h);
   display_.endWrite();
 }
 
