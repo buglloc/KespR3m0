@@ -2,12 +2,12 @@
 #include <string>
 #include <fcntl.h>
 
-#include <sdkconfig.h>
 #include <esp_spiffs.h>
 #include <esp_check.h>
 #include <esp_log.h>
 #include <esp_http_server.h>
 #include <esp_vfs.h>
+#include <esp_heap_caps.h>
 
 
 using namespace HttpD;
@@ -17,7 +17,7 @@ namespace {
   static const char *kStaticPartition = "www";
 
   typedef struct {
-    char scratch[CONFIG_KESPR_HTTP_BUF_SIZE];
+    char* scratch;
   } ServeContext;
 
   esp_err_t mountStatic()
@@ -184,7 +184,10 @@ esp_err_t StaticHandler::Register(httpd_handle_t server)
   ESP_LOGI(TAG, "mount fs");
   ESP_RETURN_ON_ERROR(mountStatic(), TAG, "mount fs");
 
-  static ServeContext ctx = {};
+  static ServeContext ctx = {
+    .scratch = reinterpret_cast<char *>(heap_caps_malloc(CONFIG_KESPR_HTTP_BUF_SIZE, MALLOC_CAP_SPIRAM))
+  };
+  assert(ctx.scratch);
   httpd_uri_t rootURI = {
       .uri = "/*",
       .method = HTTP_GET,

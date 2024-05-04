@@ -4,11 +4,9 @@
 #include <esp_check.h>
 #include <esp_log.h>
 #include <esp_http_server.h>
+#include <esp_heap_caps.h>
 
 #include <defer.h>
-
-#include "ws_keep_alive.h"
-#include "ws_commander.h"
 
 
 using namespace HttpD;
@@ -16,11 +14,9 @@ using namespace HttpD;
 namespace {
   static const char *TAG = "httpd::ws";
 
-  using BytesView = std::basic_string_view<uint8_t>;
-
   typedef struct {
-    uint8_t scratch[CONFIG_KESPR_WS_BUF_SIZE];
-    Ws::Commander *commander;
+    uint8_t* scratch;
+    const WsMsgHandler& msgHandler;
   } WsContext;
 
   static esp_err_t wsHandler(httpd_req_t *req)
@@ -63,11 +59,6 @@ namespace {
       return ESP_OK;
     }
 
-    // if (ws_pkt.type == HTTPD_WS_TYPE_PONG) {
-    //   // If it was a PONG, update the keep-alive
-    //   return HttpD::KeepAliveManager::Global(req->handle)->TouchClient(httpd_req_to_sockfd(req));
-    // }
-
     switch (ws_pkt.type) {
     case HTTPD_WS_TYPE_PING:
       ws_pkt.type = HTTPD_WS_TYPE_PONG;
@@ -78,9 +69,8 @@ namespace {
       return httpd_ws_send_frame(req, &ws_pkt);
 
     case HTTPD_WS_TYPE_TEXT: {
-      BytesView reqBody{ws_pkt.payload, ws_pkt.len};
-      assert(ctx->commander);
-      esp_err_t err = ctx->commander->Dispatch(req, reqBody);
+      std::basic_string_view<uint8_t> reqBody{ws_pkt.payload, ws_pkt.len};
+      esp_err_t err = ctx->msgHandler(sockfd, reqBody);
       ESP_RETURN_ON_ERROR(err, TAG, "dispatch failed (fd=%d): %s", sockfd, esp_err_to_name(err));
       return ESP_OK;
     }
@@ -92,13 +82,13 @@ namespace {
   }
 };
 
-esp_err_t WsHandler::Register(httpd_handle_t server, AppsManager *appsManager)
+esp_err_t WsHandler::Register(httpd_handle_t server, const WsMsgHandler& msgHandler)
 {
-  static Ws::Commander commander{appsManager};
   static WsContext ctx = {
-    .scratch = {},
-    .commander = &commander
+    .scratch = reinterpret_cast<uint8_t *>(heap_caps_malloc(CONFIG_KESPR_WS_BUF_SIZE, MALLOC_CAP_SPIRAM)),
+    .msgHandler = msgHandler
   };
+  assert(ctx.scratch != nullptr && ctx.msgHandler != nullptr);
 
   httpd_uri_t wsURI = {
     .uri = "/api/ws",

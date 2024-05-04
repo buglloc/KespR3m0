@@ -1,0 +1,23 @@
+menu "KespR3m0 Apps"
+
+  config KESPR_APPS_DISPATCH_WORKERS
+    int "Dispatch workers"
+    default 1
+
+  config KESPR_APPS_TASK_PRIORITY
+    int "Task priority"
+    default 5
+
+  config KESPR_APPS_TASK_STACK_SIZE
+    int "Task stack size"
+    default 4096
+
+  config KESPR_APPS_DISPATCH_QUEUE
+    int "Dispatch queue"
+    default 6
+
+  config KESPR_APPS_DISPATCH_TIMEOUT_MS
+    int "Dispatch timeout (ms)"
+    default 500
+
+endmenu

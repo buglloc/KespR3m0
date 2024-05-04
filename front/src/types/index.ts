@@ -15,12 +15,12 @@ export interface AppUart extends BaseApp {
 
 export type App = AppUsbKb | AppUsbKb;
 
-export interface BaseEvent {
-  cmd: string;
+export interface BaseMsg {
+  kind: string;
 }
 
-export interface EventUartRx extends BaseEvent {
+export interface MsgUartRx extends BaseMsg {
   data: string;
 }
 
-export type Event = EventUartRx;
+export type Msg = MsgUartRx;

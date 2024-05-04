@@ -10,7 +10,11 @@ menu "KespR3m0 HTTPD"
 
   config KESPR_HTTP_BUF_SIZE
     int "HTTP buf size"
-    default 4096
+    default 16384
+
+  config KESPR_WS_BUF_SIZE
+    int "WS buf size"
+    default 16384
 
   config KESPR_HTTP_FORCE_GZIP
     bool "Force gzip encoding"
@@ -19,25 +23,5 @@ menu "KespR3m0 HTTPD"
   config KESPR_HTTP_MAX_CLIENTS
     int "Maximum clients"
     default 12
-
-  config KESPR_WS_TASK_STACK_SIZE
-    int "Task stack size"
-    default 2048
-
-  config KESPR_WS_BUF_SIZE
-    int "WS buf size"
-    default 8192
-
-  config KESPR_WS_CHECK_ALIVE_PERIOD
-    int "Keep-Alive period (ms)"
-    default 5000
-    help
-        Check every client after this time
-
-  config KESPR_WS_INACTIVE_TIMEOUT
-    int "Inactive timeout (ms)"
-    default 10000
-    help
-        Consider client not alive after this time
 
 endmenu

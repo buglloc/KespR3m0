@@ -2,26 +2,25 @@
 #include <esp_err.h>
 
 #include <ArduinoJson.h>
-#include <httpd/app.h>
+#include <appsman/app.h>
 
 
-class UartApp final : public HttpD::App
+class UartApp final : public AppsMan::App
 {
 public:
   struct Context {
-    httpd_handle_t server;
     bool started;
   };
 
 public:
-  explicit UartApp() : HttpD::App("uart") {};
+  explicit UartApp() : AppsMan::App("uart") {};
 
-  std::map<std::string, HttpD::CommandHandler> Commands() override;
-  esp_err_t Start(httpd_handle_t server) override;
-  esp_err_t Stop(httpd_handle_t server) override;
+  std::map<std::string, AppsMan::MsgHandler> Handlers() override;
+  esp_err_t Start() override;
+  esp_err_t Stop() override;
 
 protected:
-  esp_err_t HandleTx(httpd_req_t *req, const JsonObjectConst& reqJson, JsonObject& rspJson);
+  esp_err_t HandleTx(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson);
 
 protected:
   Context ctx_ = {};
