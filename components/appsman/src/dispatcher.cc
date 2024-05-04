@@ -72,8 +72,7 @@ esp_err_t Dispatcher::HandleAppStart(int sockfd, const JsonObjectConst& reqJson,
     return ESP_ERR_INVALID_ARG;
   }
 
-  ESP_LOGI(TAG, "staring app: %s", appName.c_str());
-  esp_err_t err = Manager::Start(appName);
+  esp_err_t err = Manager::StartApp(appName);
   if (err != ESP_OK) {
     rspJson[kMsgErrorKey] = std::format("start failed: {}", esp_err_to_name(err));
     rspJson[kMsgErrorCodeKey] = (int)ESP_FAIL;
@@ -94,7 +93,7 @@ esp_err_t Dispatcher::RespondState(JsonObject& rspJson)
 {
   rspJson[kMsgKindKey] = "state";
   JsonObject appsJson = rspJson["apps"].to<JsonObject>();
-  Manager::Walk([&appsJson](const std::string name, const App *app) {
+  Manager::WalkApps([&appsJson](const std::string name, const App *app) {
     JsonObject appJson = appsJson[name].to<JsonObject>();
     appJson["started"] = app->Started();
   });

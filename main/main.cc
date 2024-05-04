@@ -48,8 +48,9 @@ void app_main(void)
   ESP_SHUTDOWN_ON_ERROR(Net::Start(), TAG, "start network");
 
   ESP_LOGI(TAG, "register apps");
-  ESP_SHUTDOWN_ON_ERROR(AppsMan::Manager::Register(&uartApp_), TAG, "register UART app");
-  ESP_SHUTDOWN_ON_ERROR(AppsMan::Manager::Register(&usbkbApp_), TAG, "register USBKb app");
+  ESP_SHUTDOWN_ON_ERROR(AppsMan::Manager::Initialize(), TAG, "start app manager");
+  ESP_SHUTDOWN_ON_ERROR(AppsMan::Manager::RegisterApp(&uartApp_), TAG, "register UART app");
+  ESP_SHUTDOWN_ON_ERROR(AppsMan::Manager::RegisterApp(&usbkbApp_), TAG, "register USBKb app");
 
   ESP_LOGI(TAG, "start httpd service");
   ESP_SHUTDOWN_ON_ERROR(HttpD::Start(AppsMan::Manager::HandleRequest), TAG, "start HTTP server");

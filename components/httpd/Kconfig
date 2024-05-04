@@ -10,11 +10,11 @@ menu "KespR3m0 HTTPD"
 
   config KESPR_HTTP_BUF_SIZE
     int "HTTP buf size"
-    default 4096
+    default 16384
 
   config KESPR_WS_BUF_SIZE
     int "WS buf size"
-    default 4096
+    default 16384
 
   config KESPR_HTTP_FORCE_GZIP
     bool "Force gzip encoding"

@@ -11,5 +11,6 @@ PRIV_INCLUDE_DIRS
 REQUIRES
   arduinojson esp_http_server
 PRIV_REQUIRES
-  defer esp_timer spiffs vfs log
+  esp_timer heap spiffs vfs log
+  defer
 )

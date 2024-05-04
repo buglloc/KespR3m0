@@ -31,19 +31,11 @@ namespace AppsMan
     }
 
     virtual esp_err_t Start() {
-      if (this->started_) {
-        return ESP_ERR_INVALID_STATE;
-      }
-
       this->started_ = true;
       return ESP_OK;
     }
 
     virtual esp_err_t Stop() {
-      if (!this->started_) {
-        return ESP_ERR_INVALID_STATE;
-      }
-
       this->started_ = false;
       return ESP_OK;
     }

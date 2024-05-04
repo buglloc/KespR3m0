@@ -4,6 +4,7 @@
 #include <esp_check.h>
 #include <esp_log.h>
 #include <esp_http_server.h>
+#include <esp_heap_caps.h>
 
 #include <defer.h>
 
@@ -13,10 +14,8 @@ using namespace HttpD;
 namespace {
   static const char *TAG = "httpd::ws";
 
-  using BytesView = std::basic_string_view<uint8_t>;
-
   typedef struct {
-    uint8_t scratch[CONFIG_KESPR_WS_BUF_SIZE];
+    uint8_t* scratch;
     const WsMsgHandler& msgHandler;
   } WsContext;
 
@@ -70,8 +69,7 @@ namespace {
       return httpd_ws_send_frame(req, &ws_pkt);
 
     case HTTPD_WS_TYPE_TEXT: {
-      BytesView reqBody{ws_pkt.payload, ws_pkt.len};
-      assert(ctx->msgHandler);
+      std::basic_string_view<uint8_t> reqBody{ws_pkt.payload, ws_pkt.len};
       esp_err_t err = ctx->msgHandler(sockfd, reqBody);
       ESP_RETURN_ON_ERROR(err, TAG, "dispatch failed (fd=%d): %s", sockfd, esp_err_to_name(err));
       return ESP_OK;
@@ -87,9 +85,10 @@ namespace {
 esp_err_t WsHandler::Register(httpd_handle_t server, const WsMsgHandler& msgHandler)
 {
   static WsContext ctx = {
-    .scratch = {},
+    .scratch = reinterpret_cast<uint8_t *>(heap_caps_malloc(CONFIG_KESPR_WS_BUF_SIZE, MALLOC_CAP_SPIRAM)),
     .msgHandler = msgHandler
   };
+  assert(ctx.scratch != nullptr && ctx.msgHandler != nullptr);
 
   httpd_uri_t wsURI = {
     .uri = "/api/ws",

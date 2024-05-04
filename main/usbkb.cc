@@ -5,7 +5,7 @@
 esp_err_t UsbKbApp::Start()
 {
   if (this->Started()) {
-    return ESP_ERR_INVALID_STATE;
+    return ESP_OK;
   }
 
   KESPR::GUI::ChangeApp(KESPR::GUI::App::USBKb);
@@ -16,7 +16,7 @@ esp_err_t UsbKbApp::Start()
 esp_err_t UsbKbApp::Stop()
 {
   if (!this->Started()) {
-    return ESP_ERR_INVALID_STATE;
+    return ESP_OK;
   }
 
   return AppsMan::App::Stop();

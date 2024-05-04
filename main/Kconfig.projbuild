@@ -31,7 +31,7 @@ menu "KespR3m0"
 
     config KESPR_UARTD_BUF_SIZE
       int "Buff size"
-      default 1024
+      default 4096
       depends on KESPR_UARTD_ENABLED
 
     config KESPR_UARTD_READ_PERIOD
