@@ -7,6 +7,6 @@ INCLUDE_DIRS
   "."
 REQUIRES
   driver log arduinojson
-  board httpd gui
+  board httpd appsman gui
   defer base64
 )

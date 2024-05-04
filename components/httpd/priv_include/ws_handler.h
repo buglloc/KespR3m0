@@ -4,9 +4,9 @@
 #include <esp_err.h>
 #include <esp_http_server.h>
 
-#include "apps_manager.h"
+#include "httpd/server.h"
 
 namespace HttpD::WsHandler
 {
-  esp_err_t Register(httpd_handle_t server, AppsManager* appsManager);
+  esp_err_t Register(httpd_handle_t server, const WsMsgHandler& msgHandler);
 }

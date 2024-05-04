@@ -1,23 +1,23 @@
 #include "usbkb.h"
 
-#include <httpd/events.h>
 #include <kespr_gui.h>
 
-esp_err_t UsbKbApp::Start(httpd_handle_t server)
+esp_err_t UsbKbApp::Start()
 {
-  if (this->started_) {
+  if (this->Started()) {
     return ESP_ERR_INVALID_STATE;
   }
 
   KESPR::GUI::ChangeApp(KESPR::GUI::App::USBKb);
-  return HttpD::App::Start(server);
+  KESPR::GUI::ChangeAppState(KESPR::GUI::AppState::Active);
+  return AppsMan::App::Start();
 }
 
-esp_err_t UsbKbApp::Stop(httpd_handle_t server)
+esp_err_t UsbKbApp::Stop()
 {
-  if (!this->started_) {
+  if (!this->Started()) {
     return ESP_ERR_INVALID_STATE;
   }
 
-  return HttpD::App::Stop(server);
+  return AppsMan::App::Stop();
 }

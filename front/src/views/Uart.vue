@@ -29,12 +29,12 @@ import { useWindowSize, } from '@vueuse/core';
 import { mdiConnection } from "@mdi/js";
 import { storeToRefs } from "pinia";
 import { useR3m0teStore } from "../stores/remote";
-import { Event, EventUartRx } from "../types";
+import { Msg, MsgUartRx } from "../types";
 import UartInput from "../components/UartInput.vue";
 import UartLog from "../components/UartLog.vue";
 
 const r3m0teStore = useR3m0teStore();
-const { connected, remoteEvent } = storeToRefs(r3m0teStore);
+const { connected, remoteMsg } = storeToRefs(r3m0teStore);
 
 const { height: screenH } = useWindowSize();
 
@@ -46,17 +46,17 @@ const logH = computed(() => {
 const logEl = ref(null);
 function sendMessage(msg: string) : boolean {
   const data = msg + "\n";
-  const ok = r3m0teStore.sendCommand("uart.tx", {data: btoa(data)}, true);
+  const ok = r3m0teStore.sendMsg("uart.tx", {data: btoa(data)}, true);
   logEl.value?.consumeTx(data);
   return true;
 };
 
-watch(remoteEvent, (event: Event) => {
-  if (event.cmd != "uart.rx") {
+watch(remoteMsg, (msg?: Msg) => {
+  if (msg?.kind != "uart.rx") {
     return;
   }
 
-  logEl.value?.consumeRx(atob((event as EventUartRx).data));
+  logEl.value?.consumeRx(atob((msg as MsgUartRx).data));
 });
 
 const states = {

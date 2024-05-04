@@ -59,13 +59,13 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://10.10.97.97',
+        target: 'http://10.11.0.196',
         changeOrigin: true,
         secure: false,
         ws: true,
       },
       '^/.*/ws': {
-        target: 'http://10.10.97.97',
+        target: 'http://10.11.0.196',
         changeOrigin: true,
         secure: false,
         ws: true,

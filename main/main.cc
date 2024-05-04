@@ -8,6 +8,7 @@
 #include <kespr_net.h>
 #include <defer.h>
 #include <httpd/server.h>
+#include <appsman/manager.h>
 
 #include "helpers.h"
 #include "uart.h"
@@ -46,12 +47,12 @@ void app_main(void)
   ESP_LOGI(TAG, "start network");
   ESP_SHUTDOWN_ON_ERROR(Net::Start(), TAG, "start network");
 
-  ESP_LOGI(TAG, "start service");
-  ESP_SHUTDOWN_ON_ERROR(HttpD::Start(), TAG, "start HTTP server");
-
   ESP_LOGI(TAG, "register apps");
-  ESP_SHUTDOWN_ON_ERROR(HttpD::RegisterApp(&uartApp_), TAG, "register UART app");
-  ESP_SHUTDOWN_ON_ERROR(HttpD::RegisterApp(&usbkbApp_), TAG, "register USBKb app");
+  ESP_SHUTDOWN_ON_ERROR(AppsMan::Manager::Register(&uartApp_), TAG, "register UART app");
+  ESP_SHUTDOWN_ON_ERROR(AppsMan::Manager::Register(&usbkbApp_), TAG, "register USBKb app");
+
+  ESP_LOGI(TAG, "start httpd service");
+  ESP_SHUTDOWN_ON_ERROR(HttpD::Start(AppsMan::Manager::HandleRequest), TAG, "start HTTP server");
 
   ESP_LOGI(TAG, "started");
   const TickType_t xDelay = 2000 / portTICK_PERIOD_MS;

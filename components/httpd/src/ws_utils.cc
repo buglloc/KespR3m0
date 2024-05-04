@@ -8,7 +8,7 @@ namespace {
 
   typedef struct {
     httpd_handle_t server = nullptr;
-    int fd = 0;
+    int sockfd = 0;
     Ws::FrameBuilder builder = nullptr;
     void *builderArg = nullptr;
   } AsyncFrame;
@@ -24,12 +24,12 @@ namespace {
     httpd_ws_frame_t ws_pkt;
     memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
     (*args->builder)(&ws_pkt, args->builderArg);
-    httpd_ws_send_frame_async(args->server, args->fd, &ws_pkt);
+    httpd_ws_send_frame_async(args->server, args->sockfd, &ws_pkt);
     delete(args);
   }
 }
 
-esp_err_t Ws::SendAsyncFrame(httpd_handle_t server, int fd, FrameBuilder builder, void *arg)
+esp_err_t Ws::SendAsyncFrame(httpd_handle_t server, int sockfd, FrameBuilder builder, void *arg)
 {
   if (!server || !builder) {
     return ESP_ERR_INVALID_ARG;
@@ -37,20 +37,20 @@ esp_err_t Ws::SendAsyncFrame(httpd_handle_t server, int fd, FrameBuilder builder
 
   AsyncFrame *frame = new AsyncFrame({
     .server = server,
-    .fd = fd,
+    .sockfd = sockfd,
     .builder = builder,
     .builderArg = arg
   });
   return httpd_queue_work(server, sendAsync, (void *)frame);
 }
 
-esp_err_t Ws::SendFrame(httpd_handle_t server, int fd, httpd_ws_frame_t *frame)
+esp_err_t Ws::SendFrame(httpd_handle_t server, int sockfd, httpd_ws_frame_t *frame)
 {
   if (!server || !frame) {
     return ESP_ERR_INVALID_STATE;
   }
 
-  return httpd_ws_send_frame_async(server, fd, frame);
+  return httpd_ws_send_frame_async(server, sockfd, frame);
 }
 
 esp_err_t Ws::Broadcast(httpd_handle_t server, httpd_ws_frame_t *frame)
@@ -66,13 +66,17 @@ esp_err_t Ws::Broadcast(httpd_handle_t server, httpd_ws_frame_t *frame)
 
   for (size_t i = 0; i < clients; ++i) {
     int sock = client_fds[i];
+    if (sock == 0) {
+      continue;
+    }
+
     if (httpd_ws_get_fd_info(server, sock) != HTTPD_WS_CLIENT_WEBSOCKET) {
       continue;
     }
 
     esp_err_t err = httpd_ws_send_frame_async(server, sock, frame);
     if (err != ESP_OK) {
-      ESP_LOGE(TAG, "httpd_queue_work failed");
+      ESP_LOGE(TAG, "httpd_queue_work failed: %s", esp_err_to_name(err));
       continue;
     }
   }

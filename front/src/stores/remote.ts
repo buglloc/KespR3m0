@@ -1,12 +1,12 @@
 import { watch, computed, ref, reactive } from "vue";
 import { defineStore } from "pinia";
 import { useWebSocket } from "@vueuse/core"
-import type { App, AppUsbKb, AppUart, Event } from "../types";
+import type { App, AppUsbKb, AppUart, Msg } from "../types";
 import { v4 as uuidv7 } from "uuid";
 
-function buildCommand(cmd: string, data?: any): string {
+function buildMsg(kind: string, data?: any): string {
   return JSON.stringify({
-    cmd,
+    kind,
     id: uuidv7(),
     ...data,
   });
@@ -21,7 +21,7 @@ export const useR3m0teStore = defineStore('r3m0te', () => {
     send:wsSend,
   } = useWebSocket(wsUrl, {
     heartbeat: {
-      message: buildCommand("ping"),
+      message: buildMsg("ping"),
       interval: 5000,
       pongTimeout: 1000,
     },
@@ -29,7 +29,7 @@ export const useR3m0teStore = defineStore('r3m0te', () => {
   });
 
   const initialized = ref(false);
-  const event = ref<Event>();
+  const remoteMsg = ref<Msg>();
   const appUsbKb: AppUsbKb = reactive({
     disabled: true,
     started: false,
@@ -42,8 +42,8 @@ export const useR3m0teStore = defineStore('r3m0te', () => {
     }),
   });
 
-  function sendCommand(cmd: string, params?: any, buffered?: boolean): boolean {
-    return wsSend(buildCommand(cmd, params), buffered == true);
+  function sendMsg(kind: string, params?: any, buffered?: boolean): boolean {
+    return wsSend(buildMsg(kind, params), buffered == true);
   }
 
   watch(wsStatus, (status) => {
@@ -51,7 +51,7 @@ export const useR3m0teStore = defineStore('r3m0te', () => {
       return;
     }
 
-    sendCommand("state");
+    sendMsg("state");
   });
 
   function appByName(name: string): App {
@@ -71,11 +71,11 @@ export const useR3m0teStore = defineStore('r3m0te', () => {
     }
 
     try {
-      const res = JSON.parse(rawMsg);
-      switch (res.cmd) {
+      const msg = JSON.parse(rawMsg);
+      switch (msg.kind) {
       case "state": {
         initialized.value = true;
-        const apps = res.apps as Record<string, App>;
+        const apps = msg.apps as Record<string, App>;
         for (const name in apps) {
           const app = appByName(name);
           app.disabled = false;
@@ -85,7 +85,7 @@ export const useR3m0teStore = defineStore('r3m0te', () => {
       }
 
       default:
-        event.value = res;
+        remoteMsg.value = msg;
       }
     } catch (error) {
       console.log(`unable to parse ws data ('${error}'): ${wsData.value}`);
@@ -95,14 +95,14 @@ export const useR3m0teStore = defineStore('r3m0te', () => {
   return {
     connected: computed(() => wsStatus.value == "OPEN"),
     connecting: computed(() => wsStatus.value == "CONNECTING"),
-    remoteEvent: event,
+    remoteMsg,
     initialized,
     appUsbKb,
     appUart,
     appByName,
-    sendCommand,
+    sendMsg,
     startApp: (name: string): boolean => {
-      return sendCommand("app.start", {"app": name});
+      return sendMsg("app.start", {"app": name});
     }
   };
 });

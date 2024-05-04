@@ -32,7 +32,7 @@ import StatusBar from "../components/StatusBar.vue";
 import { reactive } from "vue";
 
 const r3m0teStore = useR3m0teStore();
-const { connected, remoteEvent } = storeToRefs(r3m0teStore);
+const { connected, remoteMsg } = storeToRefs(r3m0teStore);
 
 const { mobile:isMobile } = useDisplay();
 

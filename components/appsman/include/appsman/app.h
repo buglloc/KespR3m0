@@ -4,15 +4,15 @@
 #include <map>
 
 #include <esp_err.h>
-#include <esp_http_server.h>
 
 #include <ArduinoJson.h>
 
-#define BIND_COMMAND_HANDLER(h, this) std::bind(&h, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
 
-namespace HttpD
+#define BIND_MSG_HANDLER(h, this) std::bind(&h, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+
+namespace AppsMan
 {
-  using CommandHandler = std::function<esp_err_t(httpd_req_t *req, const JsonObjectConst& reqJson, JsonObject& rspJson)>;
+  using MsgHandler = std::function<esp_err_t(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson)>;
 
   class App
   {
@@ -30,32 +30,30 @@ namespace HttpD
       return this->started_;
     }
 
-    virtual esp_err_t Start(httpd_handle_t server) {
+    virtual esp_err_t Start() {
       if (this->started_) {
         return ESP_ERR_INVALID_STATE;
       }
 
-      (void)(server);
       this->started_ = true;
       return ESP_OK;
     }
 
-    virtual esp_err_t Stop(httpd_handle_t server) {
+    virtual esp_err_t Stop() {
       if (!this->started_) {
         return ESP_ERR_INVALID_STATE;
       }
 
-      (void)(server);
       this->started_ = false;
       return ESP_OK;
     }
 
-    virtual std::map<std::string, CommandHandler> Commands() {
+    virtual std::map<std::string, MsgHandler> Handlers() {
       return {};
     }
 
   protected:
-    std::string EventName(const std::string& name) {
+    std::string MsgName(const std::string& name) {
       return name_ + "." + name;
     }
 

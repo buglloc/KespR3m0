@@ -10,9 +10,9 @@
 #include <driver/uart.h>
 #include <driver/gpio.h>
 
+#include <httpd/server.h>
 #include <defer.h>
 #include <base64.h>
-#include <httpd/events.h>
 #include <kespr_gui.h>
 
 
@@ -54,8 +54,8 @@ namespace {
     ESP_LOGI(RX_TAG, "started");
 
     UartApp::Context *ctx = static_cast<UartApp::Context *>(arg);
-    JsonDocument event;
-    event["cmd"] = "uart.rx";
+    JsonDocument msg;
+    msg["kind"] = "uart.rx";
 
     uint8_t *rawData = reinterpret_cast<uint8_t *>(malloc(kRxBufSize * 2));
     assert(rawData);
@@ -65,15 +65,19 @@ namespace {
     assert(base64Data);
     REF_DEFER(free(base64Data));
 
-    while (ctx->started && ctx->server != nullptr) {
+    while (ctx->started) {
       const int rxBytes = uart_read_bytes(USED_UART_NUM, rawData, kRxBufSize - 1, CONFIG_KESPR_UARTD_READ_PERIOD / portTICK_PERIOD_MS);
       if (rxBytes <= 0) {
         continue;
       }
 
       base64_encode(rawData, rxBytes, base64Data);
-      event["data"] = base64Data;
-      HttpD::BroadcastEvent(ctx->server, event.as<JsonVariantConst>());
+      msg["data"] = base64Data;
+      esp_err_t err = HttpD::BroadcastMsg(msg.as<JsonVariantConst>());
+      if (err != ESP_OK) {
+        ESP_LOGW(RX_TAG, "broadcast failed: %s", esp_err_to_name(err));
+        continue;
+      }
     }
 
     vTaskDelete(nullptr);
@@ -81,16 +85,16 @@ namespace {
   }
 }
 
-std::map<std::string, HttpD::CommandHandler> UartApp::Commands()
+std::map<std::string, AppsMan::MsgHandler> UartApp::Handlers()
 {
   return {
-    {"tx", BIND_COMMAND_HANDLER(UartApp::HandleTx, this)}
+    {"tx", BIND_MSG_HANDLER(UartApp::HandleTx, this)}
   };
 }
 
-esp_err_t UartApp::Start(httpd_handle_t server)
+esp_err_t UartApp::Start()
 {
-  if (this->started_) {
+  if (this->Started()) {
     return ESP_ERR_INVALID_STATE;
   }
 
@@ -102,16 +106,15 @@ esp_err_t UartApp::Start(httpd_handle_t server)
   }
 
   this->txBuf = static_cast<uint8_t *>(malloc(kTxBufSize));
-  this->ctx_.server = server;
   this->ctx_.started = true;
   xTaskCreate(rxTask, "uart_rx_task", CONFIG_KESPR_UARTD_RX_STACK_SIZE, &this->ctx_, configMAX_PRIORITIES - 1, nullptr);
 
-  return HttpD::App::Start(server);
+  return AppsMan::App::Start();
 }
 
-esp_err_t UartApp::Stop(httpd_handle_t server)
+esp_err_t UartApp::Stop()
 {
-  if (!this->started_) {
+  if (!!this->Started()) {
     return ESP_ERR_INVALID_STATE;
   }
 
@@ -119,13 +122,15 @@ esp_err_t UartApp::Stop(httpd_handle_t server)
   this->txBuf = nullptr;
   this->ctx_.started = false;
   esp_err_t err = uart_driver_delete(UART_NUM_2);
-  ESP_RETURN_ON_ERROR(err, TAG, "delete uart");
+  ESP_RETURN_ON_ERROR(err, TAG, "deinit uart");
 
-  return HttpD::App::Stop(server);
+  return AppsMan::App::Stop();
 }
 
-esp_err_t UartApp::HandleTx(httpd_req_t *req, const JsonObjectConst& reqJson, JsonObject& rspJson)
+esp_err_t UartApp::HandleTx(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson)
 {
+  (void)(sockfd);
+
   std::string_view base64Data = reqJson["data"];
   if (base64Data.size() > CONFIG_KESPR_UARTD_BUF_SIZE) {
     ESP_LOGE(TAG, "trying to parse too big msg: %d > %d", base64Data.size(), CONFIG_KESPR_UARTD_BUF_SIZE);

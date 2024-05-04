@@ -7,9 +7,6 @@
 
 #include <defer.h>
 
-#include "ws_keep_alive.h"
-#include "ws_commander.h"
-
 
 using namespace HttpD;
 
@@ -20,7 +17,7 @@ namespace {
 
   typedef struct {
     uint8_t scratch[CONFIG_KESPR_WS_BUF_SIZE];
-    Ws::Commander *commander;
+    const WsMsgHandler& msgHandler;
   } WsContext;
 
   static esp_err_t wsHandler(httpd_req_t *req)
@@ -63,11 +60,6 @@ namespace {
       return ESP_OK;
     }
 
-    // if (ws_pkt.type == HTTPD_WS_TYPE_PONG) {
-    //   // If it was a PONG, update the keep-alive
-    //   return HttpD::KeepAliveManager::Global(req->handle)->TouchClient(httpd_req_to_sockfd(req));
-    // }
-
     switch (ws_pkt.type) {
     case HTTPD_WS_TYPE_PING:
       ws_pkt.type = HTTPD_WS_TYPE_PONG;
@@ -79,8 +71,8 @@ namespace {
 
     case HTTPD_WS_TYPE_TEXT: {
       BytesView reqBody{ws_pkt.payload, ws_pkt.len};
-      assert(ctx->commander);
-      esp_err_t err = ctx->commander->Dispatch(req, reqBody);
+      assert(ctx->msgHandler);
+      esp_err_t err = ctx->msgHandler(sockfd, reqBody);
       ESP_RETURN_ON_ERROR(err, TAG, "dispatch failed (fd=%d): %s", sockfd, esp_err_to_name(err));
       return ESP_OK;
     }
@@ -92,12 +84,11 @@ namespace {
   }
 };
 
-esp_err_t WsHandler::Register(httpd_handle_t server, AppsManager *appsManager)
+esp_err_t WsHandler::Register(httpd_handle_t server, const WsMsgHandler& msgHandler)
 {
-  static Ws::Commander commander{appsManager};
   static WsContext ctx = {
     .scratch = {},
-    .commander = &commander
+    .msgHandler = msgHandler
   };
 
   httpd_uri_t wsURI = {
