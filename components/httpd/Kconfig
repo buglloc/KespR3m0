@@ -22,6 +22,6 @@ menu "KespR3m0 HTTPD"
 
   config KESPR_HTTP_MAX_CLIENTS
     int "Maximum clients"
-    default 12
+    default 10
 
 endmenu

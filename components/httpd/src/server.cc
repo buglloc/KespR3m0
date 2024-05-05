@@ -20,6 +20,8 @@ esp_err_t HttpD::Start(const WsMsgHandler& msgHandler)
 {
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
   config.lru_purge_enable = true;
+  config.keep_alive_enable = true;
+  config.enable_so_linger = true;
   config.ctrl_port = ESP_HTTPD_DEF_CTRL_PORT;
   config.server_port = CONFIG_KESPR_HTTP_PORT;
   config.max_open_sockets = CONFIG_KESPR_HTTP_MAX_CLIENTS;
