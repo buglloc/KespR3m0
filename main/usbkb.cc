@@ -1,6 +1,5 @@
 #include "usbkb.h"
 
-#include <kespr_gui.h>
 
 esp_err_t UsbKbApp::Start()
 {
@@ -8,8 +7,6 @@ esp_err_t UsbKbApp::Start()
     return ESP_OK;
   }
 
-  KESPR::GUI::ChangeApp(KESPR::GUI::App::USBKb);
-  KESPR::GUI::ChangeAppState(KESPR::GUI::AppState::Active);
   return AppsMan::App::Start();
 }
 

@@ -21,7 +21,5 @@ namespace KESPR::GUI
     Active,
   };
 
-  void ChangeApp(const App app);
-  void ChangeAppState(const AppState state);
   esp_err_t Initialize();
 }

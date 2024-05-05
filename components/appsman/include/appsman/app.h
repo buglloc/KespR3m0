@@ -17,10 +17,15 @@ namespace AppsMan
   class App
   {
   public:
-    explicit App(std::string name)
-      : name_(std::move(name))
+    explicit App(int32_t id, const std::string name)
+      : id_(id)
+      , name_(std::move(name))
       , started_(false)
     {};
+
+    virtual int32_t ID() const {
+      return id_;
+    }
 
     virtual std::string Name() const {
       return name_;
@@ -50,6 +55,7 @@ namespace AppsMan
     }
 
   protected:
+    int32_t id_;
     std::string name_;
     bool started_;
   };

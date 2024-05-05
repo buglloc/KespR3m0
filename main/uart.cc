@@ -14,7 +14,6 @@
 #include <httpd/server.h>
 #include <defer.h>
 #include <base64.h>
-#include <kespr_gui.h>
 
 
 #define USED_UART_NUM UART_NUM_2
@@ -122,8 +121,6 @@ esp_err_t UartApp::Start()
     nullptr
   );
 
-  KESPR::GUI::ChangeApp(KESPR::GUI::App::UART);
-  KESPR::GUI::ChangeAppState(KESPR::GUI::AppState::Active);
   return AppsMan::App::Start();
 }
 

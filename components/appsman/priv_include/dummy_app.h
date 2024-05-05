@@ -10,6 +10,6 @@ namespace AppsMan
   class DummyApp final : public AppsMan::App
   {
   public:
-    DummyApp() : AppsMan::App("dummy") {};
+    DummyApp() : AppsMan::App(0, "dummy") {};
   };
 }

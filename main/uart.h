@@ -1,8 +1,11 @@
 #pragma once
+#include <utility>
+
 #include <esp_err.h>
 
 #include <ArduinoJson.h>
 #include <appsman/app.h>
+#include <kespr_gui.h>
 
 
 class UartApp final : public AppsMan::App
@@ -13,7 +16,7 @@ public:
   };
 
 public:
-  explicit UartApp() : AppsMan::App("uart") {};
+  explicit UartApp() : AppsMan::App(std::to_underlying(KESPR::GUI::App::UART), "uart") {};
 
   std::map<std::string, AppsMan::MsgHandler> Handlers() override;
   esp_err_t Start() override;

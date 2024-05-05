@@ -289,7 +289,7 @@ Net::Mode Net::CurrentMode() {
   return mode_;
 }
 
-int32_t Net::Signal() {
+int8_t Net::Signal() {
   if (mode_ == Net::Mode::None) {
     return 0;
   }
