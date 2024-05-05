@@ -1,7 +1,4 @@
 <template>
-  <v-container
-    class="h-screen"
-  >
     <v-row
       align="center"
       class="h-100"
@@ -30,7 +27,6 @@
       </v-col>
       <v-spacer />
     </v-row>
-  </v-container>
 </template>
 <script setup lang="ts">
 import { ref, Ref, computed } from "vue"

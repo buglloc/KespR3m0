@@ -9,6 +9,14 @@
 //   $color-pack: false
 // );
 
+html {
+  overflow-y: auto;
+}
+
+body {
+  font-family: "Roboto", sans-serif !important;
+}
+
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
@@ -23,12 +31,4 @@
   font-display: swap;
   font-weight: 400;
   src: url(@fontsource/roboto-mono/files/roboto-mono-latin-400-normal.woff2) format('woff2');
-}
-
-html {
-  overflow-y: auto;
-}
-
-body {
-  font-family: "Roboto", sans-serif !important;
 }
