@@ -37,6 +37,6 @@ watchOnce(initialized, () => {
     return;
   }
 
-  r3m0teStore.startApp(props.name);
+  r3m0teStore.switchApp(props.name);
 });
 </script>

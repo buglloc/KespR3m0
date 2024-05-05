@@ -16,7 +16,7 @@
           :prepend-icon="app.icon"
           :disabled="app.disabled.value"
           :loading="app.loading.value"
-          @click="startApp(app)"
+          @click="switchApp(app)"
           class="pa-4"
           stacked
           variant="tonal"
@@ -72,10 +72,10 @@ const apps: Apps = {
 };
 
 const router = useRouter();
-async function startApp(app: App) {
+async function switchApp(app: App) {
   if (!r3m0teStore.appByName(app.name).started) {
     app.loading.value = true;
-    const ok = r3m0teStore.startApp(app.name);
+    const ok = r3m0teStore.switchApp(app.name);
     app.loading.value = false;
     if (!ok) {
       alert("ship happens");

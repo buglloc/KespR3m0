@@ -23,7 +23,7 @@ namespace AppsMan
     esp_err_t HandlePing(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson);
     esp_err_t HandleState(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson);
     esp_err_t HandleAppState(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson);
-    esp_err_t HandleAppStart(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson);
+    esp_err_t HandleAppSwitch(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson);
     esp_err_t HandleAppSetup(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson);
 
   protected:

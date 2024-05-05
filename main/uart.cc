@@ -80,6 +80,11 @@ namespace {
       }
     }
 
+    esp_err_t err = uart_driver_delete(UART_NUM_2);
+    if (err != ESP_OK) {
+      ESP_LOGW(RX_TAG, "deinit uart failed: %s", esp_err_to_name(err));
+    }
+
     vTaskDelete(nullptr);
     ESP_LOGI(RX_TAG, "stopped");
   }
@@ -126,15 +131,15 @@ esp_err_t UartApp::Start()
 
 esp_err_t UartApp::Stop()
 {
-  if (!!this->Started()) {
+  if (!this->Started()) {
     return ESP_OK;
   }
 
   heap_caps_free(this->txBuf);
   this->txBuf = nullptr;
   this->ctx_.started = false;
-  esp_err_t err = uart_driver_delete(UART_NUM_2);
-  ESP_RETURN_ON_ERROR(err, TAG, "deinit uart");
+
+  //TODO(buglloc): wait rx task
 
   return AppsMan::App::Stop();
 }
@@ -142,6 +147,10 @@ esp_err_t UartApp::Stop()
 esp_err_t UartApp::HandleTx(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson)
 {
   (void)(sockfd);
+
+  if (this->txBuf == nullptr) {
+    return ESP_ERR_INVALID_STATE;
+  }
 
   std::string_view base64Data = reqJson["data"];
   if (base64Data.size() > CONFIG_KESPR_UARTD_BUF_SIZE) {

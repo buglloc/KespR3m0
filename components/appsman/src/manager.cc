@@ -131,8 +131,12 @@ std::map<std::string, MsgHandler> Manager::Handlers()
   return out;
 }
 
-esp_err_t Manager::StartApp(const std::string& appName)
+esp_err_t Manager::SwitchApp(const std::string& appName)
 {
+  if (Manager::CurrentApp()->Name() == appName) {
+    return ESP_OK;
+  }
+
   App* app = FindApp(appName);
   if (app == nullptr) {
     return ESP_ERR_NOT_FOUND;
@@ -152,13 +156,6 @@ esp_err_t Manager::StartApp(const std::string& appName)
   ESP_LOGI(TAG, "app started: %s", app->Name().c_str());
   current_ = app;
   return ESP_OK;
-}
-
-esp_err_t Manager::StopApp()
-{
-  esp_err_t err = current_->Stop();
-  current_ = &dummyApp_;
-  return err;
 }
 
 esp_err_t Manager::HandleRequest(int sockfd, const std::basic_string_view<uint8_t> payload)

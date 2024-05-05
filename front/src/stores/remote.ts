@@ -101,8 +101,8 @@ export const useR3m0teStore = defineStore('r3m0te', () => {
     appUart,
     appByName,
     sendMsg,
-    startApp: (name: string): boolean => {
-      return sendMsg("app.start", {"app": name});
+    switchApp: (name: string): boolean => {
+      return sendMsg("app.switch", {"app": name});
     }
   };
 });

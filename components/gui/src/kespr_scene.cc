@@ -1,7 +1,8 @@
 #include "kespr_scene.h"
+#include <utility>
 
-#include <esp_log.h>
 #include <lvgl.h>
+
 
 LV_FONT_DECLARE(ui_font_regular);
 LV_FONT_DECLARE(ui_font_title);
@@ -75,8 +76,8 @@ namespace
 
   void initSubjects()
   {
-    lv_subject_init_int(&subjectApp_, static_cast<int32_t>(KESPR::GUI::App::None));
-    lv_subject_init_int(&subjectAppState_, static_cast<int32_t>(KESPR::GUI::AppState::Inactive));
+    lv_subject_init_int(&subjectApp_, std::to_underlying(KESPR::GUI::App::None));
+    lv_subject_init_int(&subjectAppState_, std::to_underlying(KESPR::GUI::AppState::Inactive));
     lv_subject_init_int(&subjectWiFiLevel_, 0);
     lv_subject_init_int(&subjectBattLevel_, 0);
   }

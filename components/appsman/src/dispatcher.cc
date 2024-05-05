@@ -40,7 +40,7 @@ Dispatcher::Dispatcher()
     {"ping", BIND_MSG_HANDLER(Dispatcher::HandlePing, this)},
     {"state", BIND_MSG_HANDLER(Dispatcher::HandleState, this)},
     {"app.state", BIND_MSG_HANDLER(Dispatcher::HandleAppState, this)},
-    {"app.start", BIND_MSG_HANDLER(Dispatcher::HandleAppStart, this)},
+    {"app.switch", BIND_MSG_HANDLER(Dispatcher::HandleAppSwitch, this)},
     {"app.setup", BIND_MSG_HANDLER(Dispatcher::HandleAppSetup, this)},
   })
 {};
@@ -63,7 +63,7 @@ esp_err_t Dispatcher::HandleAppState(int sockfd, const JsonObjectConst& reqJson,
   return ESP_OK;
 }
 
-esp_err_t Dispatcher::HandleAppStart(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson)
+esp_err_t Dispatcher::HandleAppSwitch(int sockfd, const JsonObjectConst& reqJson, JsonObject& rspJson)
 {
   const std::string& appName = reqJson["app"].as<std::string>();
   if (appName.empty()) {
@@ -72,7 +72,7 @@ esp_err_t Dispatcher::HandleAppStart(int sockfd, const JsonObjectConst& reqJson,
     return ESP_ERR_INVALID_ARG;
   }
 
-  esp_err_t err = Manager::StartApp(appName);
+  esp_err_t err = Manager::SwitchApp(appName);
   if (err != ESP_OK) {
     rspJson[kMsgErrorKey] = std::format("start failed: {}", esp_err_to_name(err));
     rspJson[kMsgErrorCodeKey] = (int)ESP_FAIL;

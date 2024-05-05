@@ -18,7 +18,6 @@ namespace AppsMan::Manager
 
   std::map<std::string, MsgHandler> Handlers();
 
-  esp_err_t StartApp(const std::string& appName);
-  esp_err_t StopApp();
+  esp_err_t SwitchApp(const std::string& appName);
   esp_err_t HandleRequest(int sockfd, const std::basic_string_view<uint8_t> payload);
 }
