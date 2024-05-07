@@ -14,7 +14,7 @@
   "dependencies": {
     "@fontsource/roboto": "^5.0.13",
     "@fontsource/roboto-mono": "^5.0.17",
-    "core-js": "^3.34.0",
+    "core-js": "^3.37.0",
     "pinia": "^2.1.7",
     "roboto-fontface": "*",
     "simple-keyboard": "^3.7.75",
