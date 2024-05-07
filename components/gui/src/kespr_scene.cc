@@ -4,6 +4,7 @@
 #include <lvgl.h>
 
 
+LV_FONT_DECLARE(ui_font_icons);
 LV_FONT_DECLARE(ui_font_regular);
 LV_FONT_DECLARE(ui_font_title);
 
@@ -11,6 +12,12 @@ LV_IMG_DECLARE(ui_img_kespremo_bg_full);
 LV_IMG_DECLARE(ui_img_kespremo_bg_empty);
 LV_IMG_DECLARE(ui_img_kespremo_bg_white);
 LV_IMG_DECLARE(ui_img_kespremo_bg_blue);
+
+#define UI_ARROW_UP_SYMBOL   "\xF3\xB0\x9C\xB7"
+#define UI_ARROW_DOWN_SYMBOL "\xF3\xB0\x9C\xB7"
+#define UI_WIFI_SYMBOL       "\xF3\xB0\x96\xA9"
+#define UI_BATT_SYMBOL       "\xF3\xB0\x84\x8C"
+
 
 using namespace KESPR::GUI;
 namespace
@@ -27,6 +34,7 @@ namespace
 
   lv_style_t styleAppState_;
   lv_style_t styleAppTitle_;
+  lv_style_t styleIcons_;
   lv_style_t styleStatusArc_;
   lv_style_t styleStatusArcIndicator_;
   lv_style_t styleStatusArcKnob_;
@@ -54,6 +62,16 @@ namespace
       lv_style_set_text_font(&styleAppTitle_, &ui_font_title);
       lv_style_set_text_color(&styleAppTitle_, kColorActive);
       lv_style_set_text_align(&styleAppTitle_, LV_TEXT_ALIGN_CENTER);
+    }
+
+    // icons
+    {
+      lv_style_init(&styleIcons_);
+      lv_style_set_size(&styleIcons_, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+      lv_style_set_align(&styleIcons_, LV_ALIGN_CENTER);
+      lv_style_set_text_font(&styleIcons_, &ui_font_icons);
+      lv_style_set_text_color(&styleIcons_, kColorActive);
+      lv_style_set_text_align(&styleIcons_, LV_TEXT_ALIGN_CENTER);
     }
 
     // status arc
@@ -185,11 +203,27 @@ esp_err_t Scene::Show()
   lv_arc_set_rotation(battLevel, 280);
   lv_arc_bind_value(battLevel, &subjectBattLevel_);
 
+  lv_obj_t *battLabel = lv_label_create(scene);
+  lv_obj_remove_style_all(battLabel);
+  lv_obj_add_style(battLabel, &styleIcons_, LV_PART_MAIN);
+  lv_obj_set_align(battLabel, LV_ALIGN_RIGHT_MID);
+  lv_obj_clear_flag(battLabel, kFlagsAllStatic);
+  lv_label_set_text_static(battLabel, UI_BATT_SYMBOL);
+  lv_obj_set_style_pad_right(battLabel, 4, LV_PART_MAIN);
+
   lv_obj_t *wifiLevel = createStatusArc(scene);
   lv_arc_set_range(wifiLevel, 0, KESPR::GUI::Scene::kMaxLevel);
   lv_arc_set_bg_angles(wifiLevel, 0, 70);
   lv_arc_set_rotation(wifiLevel, 100);
   lv_arc_bind_value(wifiLevel, &subjectWiFiLevel_);
+
+  lv_obj_t *wifiLabel = lv_label_create(scene);
+  lv_obj_remove_style_all(wifiLabel);
+  lv_obj_add_style(wifiLabel, &styleIcons_, LV_PART_MAIN);
+  lv_obj_set_align(wifiLabel, LV_ALIGN_LEFT_MID);
+  lv_obj_clear_flag(wifiLabel, kFlagsAllStatic);
+  lv_label_set_text_static(wifiLabel, UI_WIFI_SYMBOL);
+  lv_obj_set_style_pad_left(wifiLabel, 4, LV_PART_MAIN);
 
   return ESP_OK;
 }
