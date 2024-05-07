@@ -22,12 +22,12 @@
 using namespace AppsMan;
 namespace
 {
-  static const char *TAG = "appsman::manager";
-  static QueueHandle_t incomingQueue_ = nullptr;
-  static Dispatcher dispatcher_ = {};
-  static DummyApp dummyApp_ = {};
-  static std::map<std::string, App*> apps_ = {};
-  static App* current_ = &dummyApp_;
+  const char *TAG = "appsman::manager";
+  QueueHandle_t incomingQueue_ = nullptr;
+  Dispatcher dispatcher_ = {};
+  DummyApp dummyApp_ = {};
+  App* current_ = &dummyApp_;
+  std::map<std::string, App*> apps_ = {};
 
   typedef struct {
     int sockfd;

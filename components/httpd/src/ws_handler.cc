@@ -12,14 +12,14 @@
 using namespace HttpD;
 
 namespace {
-  static const char *TAG = "httpd::ws";
+  const char *TAG = "httpd::ws";
 
   typedef struct {
     uint8_t* scratch;
     const WsMsgHandler& msgHandler;
   } WsContext;
 
-  static esp_err_t wsHandler(httpd_req_t *req)
+  esp_err_t wsHandler(httpd_req_t *req)
   {
     int sockfd = httpd_req_to_sockfd(req);
     if (req->method == HTTP_GET) {

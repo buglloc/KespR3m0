@@ -17,11 +17,11 @@
 
 using namespace KESPR;
 namespace {
-  static const char *TAG = "main";
-  const TickType_t xWaitDelay = 100 / portTICK_PERIOD_MS;
+  const char *TAG = "main";
+  constexpr TickType_t xWaitDelay = 100 / portTICK_PERIOD_MS;
 
-  static UartApp uartApp_;
-  static UsbKbApp usbkbApp_;
+  UartApp uartApp_;
+  UsbKbApp usbkbApp_;
 }
 
 extern "C"

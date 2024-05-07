@@ -15,9 +15,9 @@ LV_IMG_DECLARE(ui_img_kespremo_bg_blue);
 using namespace KESPR::GUI;
 namespace
 {
-  static const lv_color_t kColorText = lv_color_hex(0xffffff);
-  static const lv_color_t kColorActive = lv_color_hex(0x72C0FD);
-  static const lv_color_t kColorPanel = lv_color_hex(0x212121);
+  const lv_color_t kColorText = lv_color_hex(0xffffff);
+  const lv_color_t kColorActive = lv_color_hex(0x72C0FD);
+  const lv_color_t kColorPanel = lv_color_hex(0x212121);
   constexpr lv_obj_flag_t kFlagsAllStatic =
     LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE |
     LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC |
@@ -25,16 +25,16 @@ namespace
   constexpr lv_obj_flag_t kFlagsAll =
     LV_OBJ_FLAG_CLICKABLE | kFlagsAllStatic;
 
-  static lv_style_t styleAppState_;
-  static lv_style_t styleAppTitle_;
-  static lv_style_t styleStatusArc_;
-  static lv_style_t styleStatusArcIndicator_;
-  static lv_style_t styleStatusArcKnob_;
+  lv_style_t styleAppState_;
+  lv_style_t styleAppTitle_;
+  lv_style_t styleStatusArc_;
+  lv_style_t styleStatusArcIndicator_;
+  lv_style_t styleStatusArcKnob_;
 
-  static lv_subject_t subjectApp_;
-  static lv_subject_t subjectAppState_;
-  static lv_subject_t subjectWiFiLevel_;
-  static lv_subject_t subjectBattLevel_;
+  lv_subject_t subjectApp_;
+  lv_subject_t subjectAppState_;
+  lv_subject_t subjectWiFiLevel_;
+  lv_subject_t subjectBattLevel_;
 
 
   void initStyles()

@@ -11,11 +11,11 @@
 using namespace KESPR;
 namespace
 {
-  static const char* TAG = "kespr::power";
+  const char* TAG = "kespr::power";
   constexpr int kMinLevel = 1200;
   constexpr int kMaxLevel = 1500;
 
-  static bool initialized_ = false;
+  bool initialized_ = false;
   adc_unit_t adcUnit_ = ADC_UNIT_1;
   adc_channel_t adcChannel_ = ADC_CHANNEL_0;
   adc_oneshot_unit_handle_t adcHandle_ = nullptr;

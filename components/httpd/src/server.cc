@@ -12,8 +12,8 @@
 
 
 namespace {
-  static const char *TAG = "httpd";
-  static httpd_handle_t server_ = nullptr;
+  const char *TAG = "httpd";
+  httpd_handle_t server_ = nullptr;
 }
 
 esp_err_t HttpD::Start(const WsMsgHandler& msgHandler)

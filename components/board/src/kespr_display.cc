@@ -11,9 +11,9 @@ using namespace KESPR;
 
 namespace
 {
-  static const char* TAG = "kespr::display";
-  static bool initialized_ = false;
-  static Display::WShareLCD display_ = {};
+  const char* TAG = "kespr::display";
+  bool initialized_ = false;
+  Display::WShareLCD display_ = {};
 }
 
 esp_err_t Display::Initialize()

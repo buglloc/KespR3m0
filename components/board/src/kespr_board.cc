@@ -13,8 +13,8 @@ using namespace KESPR;
 
 namespace
 {
-  static const char* TAG = "kespr::board";
-  static bool initialized_ = false;
+  const char* TAG = "kespr::board";
+  bool initialized_ = false;
 }
 
 esp_err_t Board::Initialize()

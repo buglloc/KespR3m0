@@ -19,11 +19,11 @@
 #define USED_UART_NUM UART_NUM_2
 
 namespace {
-  static const char* TAG = "app::uart";
-  static const char* RX_TAG = "app::uart::rx";
-  const size_t kRxBufSize = CONFIG_KESPR_UARTD_BUF_SIZE;
-  const size_t kRxBase64BufSize = BASE64_ENCODE_OUT_SIZE(CONFIG_KESPR_UARTD_BUF_SIZE);
-  const size_t kTxBufSize = BASE64_DECODE_OUT_SIZE(CONFIG_KESPR_UARTD_BUF_SIZE);
+  const char* TAG = "app::uart";
+  const char* RX_TAG = "app::uart::rx";
+  constexpr size_t kRxBufSize = CONFIG_KESPR_UARTD_BUF_SIZE;
+  constexpr size_t kRxBase64BufSize = BASE64_ENCODE_OUT_SIZE(CONFIG_KESPR_UARTD_BUF_SIZE);
+  constexpr size_t kTxBufSize = BASE64_DECODE_OUT_SIZE(CONFIG_KESPR_UARTD_BUF_SIZE);
 
   esp_err_t initUart()
   {
@@ -49,7 +49,7 @@ namespace {
     return ESP_OK;
   }
 
-  static void rxTask(void *arg)
+  void rxTask(void *arg)
   {
     ESP_LOGI(RX_TAG, "started");
 

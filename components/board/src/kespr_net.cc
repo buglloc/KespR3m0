@@ -27,12 +27,12 @@ using namespace KESPR;
 
 namespace
 {
-  static const char* TAG = "kespr::net";
-  static EventGroupHandle_t stateGroup_;
-  static int retryNum_ = 0;
-  static bool started_ = false;
-  static Net::Mode mode_ = Net::Mode::None;
-  static esp_ip4_addr_t ipAddr_ = {
+  const char* TAG = "kespr::net";
+  EventGroupHandle_t stateGroup_;
+  int retryNum_ = 0;
+  bool started_ = false;
+  Net::Mode mode_ = Net::Mode::None;
+  esp_ip4_addr_t ipAddr_ = {
     .addr = IPADDR_NONE
   };
 

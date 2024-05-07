@@ -12,9 +12,9 @@
 
 using namespace HttpD;
 namespace {
-  static const char *TAG = "httpd::static";
-  static const char *kStaticPath = "/www";
-  static const char *kStaticPartition = "www";
+  const char *TAG = "httpd::static";
+  const char *kStaticPath = "/www";
+  const char *kStaticPartition = "www";
 
   typedef struct {
     char* scratch;
