@@ -47,7 +47,7 @@
     "virtua": "^0.29.1",
     "vite": "^5.2.8",
     "vite-plugin-vuetify": "^2.0.3",
-    "vue-router": "^4.3.0",
+    "vue-router": "^4.3.2",
     "vue-tsc": "^2.0.12"
   }
 }
