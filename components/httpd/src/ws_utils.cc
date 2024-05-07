@@ -4,7 +4,7 @@
 
 using namespace HttpD;
 namespace {
-  static const char *TAG = "httpd::ws::utils";
+  const char *TAG = "httpd::ws::utils";
 
   typedef struct {
     httpd_handle_t server = nullptr;

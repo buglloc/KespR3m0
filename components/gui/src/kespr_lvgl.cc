@@ -20,10 +20,10 @@ using namespace KESPR::GUI;
 
 namespace
 {
-  static const char* TAG = "kespr::gui::lvgl";
-  const uint32_t kMaxSleepMs = CONFIG_KESPR_GUI_PERIOD_TIME_MS * 2;
-  static SemaphoreHandle_t guiMu_ = {};
-  static lv_display_t *lvDisp_ = nullptr;
+  const char* TAG = "kespr::gui::lvgl";
+  constexpr uint32_t kMaxSleepMs = CONFIG_KESPR_GUI_PERIOD_TIME_MS * 2;
+  SemaphoreHandle_t guiMu_ = {};
+  lv_display_t *lvDisp_ = nullptr;
 
   void lvTask(void *arg)
   {

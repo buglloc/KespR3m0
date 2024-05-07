@@ -23,14 +23,14 @@ using namespace KESPR::GUI;
 
 namespace
 {
-  static const char* TAG = "kespr::gui";
+  const char* TAG = "kespr::gui";
   constexpr int8_t kLevelThreshold = 5;
 
-  static App lastApp_ = App::None;
-  static AppState lastAppState_ = AppState::Inactive;
-  static int8_t lastWiFiSignal_ = 0;
-  static int8_t lastBattLevel_ = 0;
-  static uint16_t ticksToUpdateInfo_ = 0;
+  App lastApp_ = App::None;
+  AppState lastAppState_ = AppState::Inactive;
+  int8_t lastWiFiSignal_ = 0;
+  int8_t lastBattLevel_ = 0;
+  uint16_t ticksToUpdateInfo_ = 0;
 
   void lvTick(lv_timer_t *t)
   {

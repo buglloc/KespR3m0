@@ -13,11 +13,11 @@
 using namespace AppsMan;
 namespace
 {
-  static const char *TAG = "appsman::dispatcher";
-  static const char *kMsgIdKey = "id";
-  static const char *kMsgKindKey = "kind";
-  static const char *kMsgErrorKey = "error";
-  static const char *kMsgErrorCodeKey = "error_code";
+  const char *TAG = "appsman::dispatcher";
+  constexpr std::string_view kMsgIdKey = "id";
+  constexpr std::string_view kMsgKindKey = "kind";
+  constexpr std::string_view kMsgErrorKey = "error";
+  constexpr std::string_view kMsgErrorCodeKey = "error_code";
 
   template <class... Types>
   constexpr inline int UNUSED(Types&&...) {
