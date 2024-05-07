@@ -25,4 +25,9 @@ menu "KespR3m0 GUI"
     range 5 500
     default 120
 
+  config KESPR_GUI_INFO_UPDATE_PERIOD_MS
+    int "How ofen update very dynamic info (e.g. core temp) in ms"
+    range 50 5000
+    default 240
+
 endmenu

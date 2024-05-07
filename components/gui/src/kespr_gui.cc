@@ -12,10 +12,11 @@
 
 #include <appsman/manager.h>
 
-#include "kespr_net.h"
 #include "kespr_lvgl.h"
 #include "kespr_scene.h"
 #include "kespr_display.h"
+#include "kespr_net.h"
+#include "kespr_power.h"
 
 
 using namespace KESPR::GUI;
@@ -23,10 +24,13 @@ using namespace KESPR::GUI;
 namespace
 {
   static const char* TAG = "kespr::gui";
+  constexpr int8_t kLevelThreshold = 5;
 
   static App lastApp_ = App::None;
   static AppState lastAppState_ = AppState::Inactive;
   static int8_t lastWiFiSignal_ = 0;
+  static int8_t lastBattLevel_ = 0;
+  static uint16_t ticksToUpdateInfo_ = 0;
 
   void lvTick(lv_timer_t *t)
   {
@@ -41,10 +45,22 @@ namespace
     //   Scene::SetAppState(lastAppState_);
     // }
 
+    if (ticksToUpdateInfo_ > 0) {
+      ticksToUpdateInfo_--;
+      return;
+    }
+    ticksToUpdateInfo_ = (CONFIG_KESPR_GUI_INFO_UPDATE_PERIOD_MS / CONFIG_KESPR_GUI_PERIOD_TIME_MS);
+
     uint8_t curWifiSignal = KESPR::Net::Signal();
-    if (abs(lastWiFiSignal_ - curWifiSignal) > 5) {
+    if (abs(lastWiFiSignal_ - curWifiSignal) > kLevelThreshold) {
       lastWiFiSignal_ = curWifiSignal;
       Scene::SetWiFiLevel(lastWiFiSignal_);
+    }
+
+    uint8_t curBattLevel = KESPR::Power::BattLevel();
+    if (abs(lastBattLevel_ - curBattLevel) > kLevelThreshold) {
+      lastBattLevel_ = curBattLevel;
+      Scene::SetBattLevel(lastBattLevel_);
     }
   }
 }

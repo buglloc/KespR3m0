@@ -3,6 +3,7 @@ SRCS
   "src/kespr_board.cc"
   "src/kespr_display.cc"
   "src/kespr_net.cc"
+  "src/kespr_power.cc"
 
   "src/display_wshare_lcd.cc"
 INCLUDE_DIRS
@@ -12,7 +13,7 @@ PRIV_INCLUDE_DIRS
 REQUIRES
   esp_netif
 PRIV_REQUIRES
-  esp_wifi esp_event nvs_flash
+  esp_wifi esp_event nvs_flash esp_adc
   dns_server LovyanGFX
 )
 
