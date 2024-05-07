@@ -6,6 +6,8 @@
 
 #include <nvs_flash.h>
 
+#include "kespr_power.h"
+
 
 using namespace KESPR;
 
@@ -36,5 +38,5 @@ esp_err_t Board::Initialize()
   ESP_RETURN_ON_ERROR(err, TAG, "failed to initialize ESP event loop");
 
   initialized_ = true;
-  return ESP_OK;
+  return KESPR::Power::Initialize();
 }

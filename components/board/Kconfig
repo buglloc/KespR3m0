@@ -79,4 +79,10 @@ menu "KespR3m0 Network"
 
   endmenu
 
+  menu "Power"
+    config KESPR_BATT_IO_NUM
+    int "Battery PIN"
+    default 1
+  endmenu
+
 endmenu
