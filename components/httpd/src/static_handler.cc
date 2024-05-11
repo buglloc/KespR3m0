@@ -57,7 +57,7 @@ namespace {
     } else if (filepath.ends_with(".webp")) {
       type = "image/webp";
     } else if (filepath.ends_with(".svg")) {
-      type = "text/xml";
+      type = "image/svg+xml";
     }
 
     if (forceCache) {
@@ -88,7 +88,7 @@ namespace {
     } else if (filepath.ends_with(".webp.gz")) {
       type = "image/webp";
     } else if (filepath.ends_with(".svg.gz")) {
-      type = "text/xml";
+      type = "image/svg+xml";
     }
 
     if (forceCache) {
