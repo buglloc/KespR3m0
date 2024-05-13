@@ -20,7 +20,7 @@
     "simple-keyboard": "^3.7.75",
     "uuid": "^9.0.1",
     "vue": "^3.4.21",
-    "vuetify": "^3.5.15"
+    "vuetify": "^3.6.5"
   },
   "devDependencies": {
     "@babel/types": "^7.24.5",
