@@ -4,7 +4,7 @@
 #include <esp_event.h>
 #include <esp_log.h>
 
-#include "display_wshare_lcd.h"
+#include "st7789_lcd.h"
 
 
 using namespace KESPR;
@@ -13,7 +13,7 @@ namespace
 {
   const char* TAG = "kespr::display";
   bool initialized_ = false;
-  Display::WShareLCD display_ = {};
+  Display::ST7789LCD display_ = {};
 }
 
 esp_err_t Display::Initialize()
@@ -24,7 +24,7 @@ esp_err_t Display::Initialize()
   }
 
   esp_err_t err = display_.Initialize();
-  ESP_RETURN_ON_ERROR(err, TAG, "initialize waveshare display");
+  ESP_RETURN_ON_ERROR(err, TAG, "initialize display");
 
   initialized_ = true;
 

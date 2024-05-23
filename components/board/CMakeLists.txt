@@ -5,7 +5,7 @@ SRCS
   "src/kespr_net.cc"
   "src/kespr_power.cc"
 
-  "src/display_wshare_lcd.cc"
+  "src/st7789_lcd.cc"
 INCLUDE_DIRS
   "include"
 PRIV_INCLUDE_DIRS
