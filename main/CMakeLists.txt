@@ -8,5 +8,5 @@ INCLUDE_DIRS
 REQUIRES
   driver heap log arduinojson
   board httpd appsman gui
-  defer base64
+  scope_guard base64
 )

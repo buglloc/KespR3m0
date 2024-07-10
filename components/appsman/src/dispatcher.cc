@@ -123,7 +123,7 @@ esp_err_t Dispatcher::Dispatch(int sockfd, std::basic_string_view<uint8_t> paylo
 {
   JsonDocument rspDoc;
   JsonObject rspJson = rspDoc.to<JsonObject>();
-  REF_DEFER(sendResponse(sockfd, rspJson));
+  DEFER{ sendResponse(sockfd, rspJson); };
 
   JsonDocument reqJson;
   DeserializationError jsonErr = deserializeJson(reqJson, payload);

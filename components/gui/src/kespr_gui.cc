@@ -74,7 +74,7 @@ esp_err_t KESPR::GUI::Initialize()
 
   bool locked = LVGL::Lock(0);
   ESP_RETURN_ON_FALSE(locked, ESP_FAIL, TAG, "take lvgl lock");
-  NONE_DEFER(LVGL::Unlock());
+  DEFER{ LVGL::Unlock(); };
 
   err = KESPR::GUI::Scene::Show();
   ESP_RETURN_ON_ERROR(err, TAG, "show scene");

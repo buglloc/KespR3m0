@@ -6,7 +6,7 @@
 #include <kespr_display.h>
 #include <kespr_gui.h>
 #include <kespr_net.h>
-#include <defer.h>
+
 #include <httpd/server.h>
 #include <appsman/manager.h>
 

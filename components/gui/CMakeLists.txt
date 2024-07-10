@@ -15,5 +15,5 @@ PRIV_INCLUDE_DIRS
 PRIV_REQUIRES
   esp_timer heap esp_hw_support
   driver lvgl
-  board appsman defer
+  board appsman scope_guard
 )
