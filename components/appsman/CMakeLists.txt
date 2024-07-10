@@ -9,5 +9,5 @@ PRIV_INCLUDE_DIRS
 REQUIRES
   arduinojson httpd
 PRIV_REQUIRES
-  defer
+  scope_guard
 )

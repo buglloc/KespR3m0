@@ -59,11 +59,11 @@ namespace {
 
     uint8_t *rawData = reinterpret_cast<uint8_t *>(heap_caps_malloc(kRxBufSize * 2, MALLOC_CAP_SPIRAM));
     assert(rawData);
-    REF_DEFER(heap_caps_free(rawData));
+    DEFER{ heap_caps_free(rawData); };
 
     char *base64Data = reinterpret_cast<char *>(heap_caps_malloc(kRxBase64BufSize, MALLOC_CAP_SPIRAM));
     assert(base64Data);
-    REF_DEFER(heap_caps_free(base64Data));
+    DEFER{ heap_caps_free(base64Data); };
 
     while (ctx->started) {
       const int rxBytes = uart_read_bytes(USED_UART_NUM, rawData, kRxBufSize - 1, CONFIG_KESPR_UARTD_READ_PERIOD / portTICK_PERIOD_MS);

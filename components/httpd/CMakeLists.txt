@@ -12,5 +12,5 @@ REQUIRES
   arduinojson esp_http_server
 PRIV_REQUIRES
   esp_timer heap spiffs vfs log
-  defer
+  scope_guard
 )

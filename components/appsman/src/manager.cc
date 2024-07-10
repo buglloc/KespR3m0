@@ -13,7 +13,6 @@
 #include <esp_event.h>
 
 #include <httpd/server.h>
-#include <defer.h>
 
 #include "dispatcher.h"
 #include "dummy_app.h"
