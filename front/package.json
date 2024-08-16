@@ -28,7 +28,7 @@
     "@types/node": "^20.12.12",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-typescript": "^13.0.0",
-    "@vueuse/core": "^10.9.0",
+    "@vueuse/core": "^11.0.0",
     "ansi-to-vue3": "^0.1.2",
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
